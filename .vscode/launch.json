@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        },
+        {
+            "name": "C#: TestApp",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/TestApp/bin/Debug/net7.0/TestApp.dll",
+            "cwd": "${workspaceFolder}/TestApp",
+            "stopAtEntry": false,
+            "projectPath": "${workspaceFolder}/TestApp/TestApp.csproj",
+            "launchConfigurationId": "TargetFramework=;TestApp",
+            "args": ["-tosecpath", "/Volumes/Macintosh HD/Users/michaelgreen/Downloads/TOSEC.2016.11.11.Commodore.C64.AlphaBot/"]
+        }
+    ]
+}

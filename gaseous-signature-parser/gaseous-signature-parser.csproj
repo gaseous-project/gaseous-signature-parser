@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
+    <RootNamespace>gaseous_signature_parser</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="classes/" />
+    <Folder Include="classes/parsers/" />
+    <Folder Include="models/" />
+    <Folder Include="support/" />
+    <Folder Include="support/parsers/" />
+    <Folder Include="support/parsers/tosec/" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="support/parsers/tosec/Copyright.txt" />
+    <None Remove="support/parsers/tosec/Country.txt" />
+    <None Remove="support/parsers/tosec/DevelopmentStatus.txt" />
+    <None Remove="support/parsers/tosec/Language.txt" />
+    <None Remove="support/parsers/tosec/Systems.txt" />
+    <None Remove="support/parsers/tosec/Video.txt" />
+    <None Remove="support/" />
+    <None Remove="Classes/" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="support/parsers/tosec/Copyright.txt" />
+    <EmbeddedResource Include="support/parsers/tosec/Country.txt" />
+    <EmbeddedResource Include="support/parsers/tosec/DevelopmentStatus.txt" />
+    <EmbeddedResource Include="support/parsers/tosec/Language.txt" />
+    <EmbeddedResource Include="support/parsers/tosec/Systems.txt" />
+    <EmbeddedResource Include="support/parsers/tosec/Video.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="support/" />
+    <Folder Include="Classes/" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>
