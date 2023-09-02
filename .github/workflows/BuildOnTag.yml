@@ -29,9 +29,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --no-restore --configuration Release ./gaseous-signature-parser/gaseous-signature-parser.csproj
     - name: nuget pack
-      run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }}
+      run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} ./gaseous-signature-parser/gaseous-signature-parser.csproj
     - uses: actions/upload-artifact@v3
       with:
         name: nuget
