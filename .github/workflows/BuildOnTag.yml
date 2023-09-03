@@ -55,15 +55,6 @@ jobs:
         with:
           dotnet-version: 7.0.x
       - name: Sign in to Nuget
-        run: dotnet nuget add source --username michael-j-green --password ${{ secrets.NUGETKEY }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/gaseous-project/gaseous-signature-parser/index.json"
+        run: dotnet nuget add source --username michael-j-green --password ${{ secrets.NUGETKEY }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/gaseous-project/index.json"
       - name: Push to Nuget
         run: dotnet nuget push "${{ env.NuGetDirectory }}/*.nupkg"  --api-key ${{ secrets.NUGETKEY }} --source "github" --skip-duplicate 
-      # - uses: actions/github-script@v6.4.1
-      #   with:
-      #     script: |
-      #       github.rest.git.createRef({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         ref: "${{ github.ref }}",
-      #         sha: context.sha
-      #       })

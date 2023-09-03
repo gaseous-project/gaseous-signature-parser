@@ -6,7 +6,43 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>10.0</LangVersion>
+
+    <!-- nuget spec -->
+    <NuspecProperties>version=$(PackageVersion)</NuspecProperties>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <PackageId>gaseous-signature-parser</PackageId>
+    <Description>Provides a parser for TOSEC and other DAT files</Description>
+    <Authors>Gaseous Games</Authors>
+    <Copyright>Copyright 2023 Gaseous Games</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gaseous-project/gaseous-signature-parser</PackageProjectUrl>
+    <RepositoryBranch>main</RepositoryBranch>
+    <RepositoryUrl>https://github.com/gaseous-project/gaseous-signature-parser</RepositoryUrl>
+    <PackageTags>igdb dotnet games retro management manager rom emulation</PackageTags>
+    <PackageIconUrl>https://avatars.githubusercontent.com/u/125975681</PackageIconUrl>
+    <PackageReleaseNotes>See https://github.com/gaseous-project/gaseous-signature-parser/releases</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" developmentDependency="true" />
+    <PackageReference Include="RestEase" Version="1.5.5" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="classes/" />
