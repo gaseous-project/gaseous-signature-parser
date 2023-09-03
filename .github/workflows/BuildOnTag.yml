@@ -26,6 +26,8 @@ jobs:
       run: dotnet tool install -g dotnetCampus.TagToVersion
     - name: Set tag to version  
       run: dotnet TagToVersion -t ${{ github.ref }}
+    - name: Store tag version for later
+      run: echo "tagversion=$(dotnet TagToVersion -c -t ${{ github.ref }})" >> "$GITHUB_ENV"
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -42,6 +44,7 @@ jobs:
   deploy_release:
     runs-on: ubuntu-latest
     needs: [ build ]
+    permissions: write-all
     steps:
       - uses: actions/download-artifact@v3
         with:
@@ -61,6 +64,6 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/${{github.ref}}',
+              ref: "$tagversion",
               sha: context.sha
             })
