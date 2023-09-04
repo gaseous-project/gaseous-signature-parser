@@ -355,6 +355,7 @@ namespace gaseous_signature_parser.classes.parsers
 
                         case "rom":
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
+                            romObject.Attributes = new List<KeyValuePair<string, object>>();
                             if (xmlGameDetail != null)
                             {
                                 romObject.Name = xmlGameDetail.Attributes["name"]?.Value;
@@ -452,7 +453,10 @@ namespace gaseous_signature_parser.classes.parsers
                                                 string[] dTokenCompare = dToken.Split(" ");
                                                 if (dTokenCompare[0].Trim().ToLower().StartsWith("a"))
                                                 {
-                                                    romObject.flags.Add(dTokenCompare[0].Trim());
+                                                    romObject.Attributes.Add(new KeyValuePair<string, object>(
+                                                        "a",
+                                                        dTokenCompare[0].Trim()
+                                                    ));
                                                 }
                                                 else
                                                 {
@@ -486,7 +490,11 @@ namespace gaseous_signature_parser.classes.parsers
                                                         case "!":
                                                             // known verified dump
                                                             // -------------------
-                                                            romObject.flags.Add(dToken);
+                                                            string shavedToken = dToken.Substring(dTokenCompare[0].Trim().Length).Trim();
+                                                            romObject.Attributes.Add(new KeyValuePair<string, object>(
+                                                                dTokenCompare[0].Trim().ToLower(),
+                                                                shavedToken
+                                                            ));
                                                             break;
                                                     }
                                                 }
@@ -526,16 +534,16 @@ namespace gaseous_signature_parser.classes.parsers
             return tosecObject;
         }
 
-        public bool IsTOSEC(XmlDocument xml) {
+        public parser.SignatureParser GetXmlType(XmlDocument xml) {
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
             if (xmlHeader != null) {
                 if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase)) {
-                    return true;
+                    return parser.SignatureParser.TOSEC;
                 }
             }
 
-            return false;
+            return parser.SignatureParser.Unknown;
         }
 	}
 }

@@ -69,21 +69,28 @@ if (tosecXML != null && tosecXML.Length > 0)
         string tosecXMLFile = tosecPathContents[i];
 
         parser Parser = new parser();
-        RomSignatureObject tosecObject = Parser.ParseSignatureDAT(tosecXMLFile);
+        try {
+            RomSignatureObject tosecObject = Parser.ParseSignatureDAT(tosecXMLFile);
 
-        string statusOutput = i + " / " + tosecPathContents.Length + " : " + Path.GetFileName(tosecXMLFile);
-        Console.Write("\r " + statusOutput.PadRight(lastCLILineLength, ' ') + "\r");
-        lastCLILineLength = statusOutput.Length;
+            if (tosecObject != null) {
+                string statusOutput = i + " / " + tosecPathContents.Length + " : " + Path.GetFileName(tosecXMLFile);
+                Console.Write("\r " + statusOutput.PadRight(lastCLILineLength, ' ') + "\r");
+                lastCLILineLength = statusOutput.Length;
 
-        foreach (RomSignatureObject.Game gameRom in tosecObject.Games)
-        {
-            if (!availablePlatforms.Contains(gameRom.System))
-            {
-                availablePlatforms.Add(gameRom.System);
+                foreach (RomSignatureObject.Game gameRom in tosecObject.Games)
+                {
+                    if (!availablePlatforms.Contains(gameRom.System))
+                    {
+                        availablePlatforms.Add(gameRom.System);
+                    }
+                }
+
+                romSignatures.Add(tosecObject);
             }
         }
-
-        romSignatures.Add(tosecObject);
+        catch {
+            
+        }
     }
     Console.WriteLine("");
 } else
@@ -167,7 +174,7 @@ foreach (string romFile in romPathContents)
     }
 }
 
-string SearchTitle = "California Games";
+string SearchTitle = "Impossible Mission";
 foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)

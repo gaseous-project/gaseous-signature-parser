@@ -38,6 +38,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
             public string? Language { get; set; }
             public string? Copyright { get; set; }
             public List<Rom> Roms { get; set; } = new List<Rom>();
+            public List<KeyValuePair<string, object>> flags { get; set; } = new List<KeyValuePair<string, object>>();
             public int RomCount
             {
                 get
@@ -66,7 +67,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                 public string? DevelopmentStatus { get; set; }
 
-                public List<string> flags { get; set; } = new List<string>();
+                public List<KeyValuePair<string, object>> Attributes { get; set; } = new List<KeyValuePair<string, object>>();
 
                 public RomTypes RomType { get; set; }
                 public string? RomTypeMedia { get; set; }
@@ -77,7 +78,9 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 public enum SignatureSourceType
                 {
                     None = 0,
-                    TOSEC = 1
+                    TOSEC = 1,
+                    MAMEArcade = 2,
+                    MAMEMess = 3
                 }
 
                 public enum RomTypes

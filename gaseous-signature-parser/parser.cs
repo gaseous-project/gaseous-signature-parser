@@ -17,7 +17,14 @@ public class parser
     public RomSignatureObject ParseSignatureDAT(string PathToFile, SignatureParser Parser = SignatureParser.Auto) {
         SignatureParser DetectedSignatureType = SignatureParser.Auto;
         if (Parser == SignatureParser.Auto) {
-            DetectedSignatureType = GetSignatureType(PathToFile);
+            try {
+                Debug.WriteLine("Checking: " + PathToFile);
+                DetectedSignatureType = GetSignatureType(PathToFile);
+            }
+            catch (Exception ex) {
+                Debug.WriteLine("Unknown file type");
+                return null;
+            }
         } else {
             DetectedSignatureType = Parser;
         }
@@ -27,23 +34,42 @@ public class parser
                 classes.parsers.TosecParser tosecParser = new classes.parsers.TosecParser();
 
                 return tosecParser.Parse(PathToFile);
-                break;
+
+            case SignatureParser.MAMEArcade:
+            case SignatureParser.MAMEMess:
+                classes.parsers.MAMEParser mAMEParser = new classes.parsers.MAMEParser();
+
+                return mAMEParser.Parse(PathToFile, DetectedSignatureType);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
-                break;
+
         }
     }
 
     private SignatureParser GetSignatureType(string PathToFile) {
         XmlDocument XmlDoc = new XmlDocument();
-        XmlDoc.Load(PathToFile);
+        try {
+            XmlDoc.Load(PathToFile);
+        }
+        catch (Exception ex) {
+            throw new Exception("Not an XML file", ex);
+        }
 
         // check if TOSEC
         classes.parsers.TosecParser tosecParser = new classes.parsers.TosecParser();
-        if (tosecParser.IsTOSEC(XmlDoc)) {
+        if (tosecParser.GetXmlType(XmlDoc) == SignatureParser.TOSEC) {
             Debug.WriteLine("TOSEC: " + PathToFile);
             return SignatureParser.TOSEC;
+        }
+
+        // check if MAMEArcade
+        classes.parsers.MAMEParser mAMEArcadeParser = new classes.parsers.MAMEParser();
+        SignatureParser mameSigType = mAMEArcadeParser.GetXmlType(XmlDoc);
+        if (mameSigType != SignatureParser.Unknown) {
+            Debug.WriteLine(mameSigType.ToString() + ": " + PathToFile);
+            return mameSigType;
         }
 
         // unable to determine type
@@ -53,6 +79,26 @@ public class parser
     public enum SignatureParser {
         Auto = 0,
         TOSEC = 1,
+        MAMEArcade = 2,
+        MAMEMess = 3,
         Unknown = 100
+    }
+
+    public static Dictionary<string, object> ConvertXmlNodeToDictionary(XmlNode node)
+    {
+        Dictionary<string, object> map = new Dictionary<string, object>();
+        
+        // get node attributes first
+        foreach (XmlAttribute attribute in node.Attributes)
+        {
+            map.Add(attribute.Name, attribute.Value);
+        }
+
+        // get children
+        foreach (XmlNode xmlNode in node.ChildNodes) {
+            map.Add(xmlNode.Name, ConvertXmlNodeToDictionary(xmlNode));
+        }
+
+        return map;
     }
 }
