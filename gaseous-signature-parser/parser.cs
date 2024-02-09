@@ -41,6 +41,11 @@ public class parser
 
                 return mAMEParser.Parse(PathToFile, DetectedSignatureType);
 
+            case SignatureParser.NoIntro:
+                classes.parsers.NoIntrosParser noIntrosParser = new classes.parsers.NoIntrosParser();
+
+                return noIntrosParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -72,6 +77,13 @@ public class parser
             return mameSigType;
         }
 
+        // check if NoIntro
+        classes.parsers.NoIntrosParser noIntroParser = new classes.parsers.NoIntrosParser();
+        if (noIntroParser.GetXmlType(XmlDoc) == SignatureParser.NoIntro) {
+            Debug.WriteLine("No-Intro: " + PathToFile);
+            return SignatureParser.NoIntro;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -81,6 +93,7 @@ public class parser
         TOSEC = 1,
         MAMEArcade = 2,
         MAMEMess = 3,
+        NoIntro = 4,
         Unknown = 100
     }
 

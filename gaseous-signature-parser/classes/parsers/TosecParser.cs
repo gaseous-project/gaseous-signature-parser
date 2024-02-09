@@ -535,15 +535,22 @@ namespace gaseous_signature_parser.classes.parsers
         }
 
         public parser.SignatureParser GetXmlType(XmlDocument xml) {
-            XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
+            try
+            {
+                XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-            if (xmlHeader != null) {
-                if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase)) {
-                    return parser.SignatureParser.TOSEC;
+                if (xmlHeader != null) {
+                    if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase)) {
+                        return parser.SignatureParser.TOSEC;
+                    }
                 }
-            }
 
-            return parser.SignatureParser.Unknown;
+                return parser.SignatureParser.Unknown;
+            }
+            catch
+            {
+                return parser.SignatureParser.Unknown;
+            }
         }
 	}
 }

@@ -62,7 +62,7 @@ if (tosecXML != null && tosecXML.Length > 0)
     Console.WriteLine("TOSEC is enabled");
     Console.WriteLine("TOSEC XML search path: " + tosecXML);
 
-    string[] tosecPathContents = Directory.GetFiles(tosecXML);
+    string[] tosecPathContents = Directory.GetFiles(tosecXML, "*.dat");
     int lastCLILineLength = 0;
     for (UInt16 i = 0; i < tosecPathContents.Length; ++i)
     {

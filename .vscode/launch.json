@@ -16,7 +16,7 @@
             "stopAtEntry": false,
             "projectPath": "${workspaceFolder}/TestApp/TestApp.csproj",
             "launchConfigurationId": "TargetFramework=;TestApp",
-            "args": ["-tosecpath", "/Volumes/Macintosh HD/Users/michaelgreen/Downloads/TOSEC.2016.11.11.Commodore.C64.AlphaBot/"]
+            "args": ["-tosecpath", "/Users/michaelgreen/Downloads/NoIntroTest/"]
         }
     ]
 }

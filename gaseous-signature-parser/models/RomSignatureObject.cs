@@ -10,6 +10,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
     /// </summary>
 	public class RomSignatureObject
     {
+        public string? Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Category { get; set; }
@@ -26,6 +27,9 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
         public class Game
         {
+            public string? Id { get; set; }
+            public string? GameId { get; set; }
+            public string? Category { get; set; }
             public string? Name { get; set; }
             public string? Description { get; set; }
             public string? Year { get; set; }
@@ -59,6 +63,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
             public class Rom
             {
+                public string? Id { get; set; }
                 public string? Name { get; set; }
                 public UInt64? Size { get; set; }
                 public string? Crc { get; set; }
@@ -71,6 +76,19 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                 public RomTypes RomType { get; set; }
                 public string? RomTypeMedia { get; set; }
+                public MediaType? MediaDetail {
+                    get
+                    {
+                        if (RomTypeMedia != null)
+                        {
+                            return new MediaType(SignatureSource, RomTypeMedia);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
                 public string? MediaLabel { get; set; }
 
                 public SignatureSourceType SignatureSource { get; set; }
@@ -80,7 +98,8 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     None = 0,
                     TOSEC = 1,
                     MAMEArcade = 2,
-                    MAMEMess = 3
+                    MAMEMess = 3,
+                    NoIntros = 4
                 }
 
                 public enum RomTypes
@@ -120,8 +139,95 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// </summary>
                     Side = 6
                 }
-            }
 
+                public class MediaType
+                {
+                    public MediaType(SignatureSourceType Source, string MediaTypeString)
+                    {
+                        switch (Source)
+                        {
+                            case Rom.SignatureSourceType.TOSEC:
+                            case Rom.SignatureSourceType.NoIntros:
+                                string[] typeString = MediaTypeString.Split(" ");
+
+                                string inType = "";
+                                foreach (string typeStringVal in typeString)
+                                {
+                                    if (inType == "")
+                                    {
+                                        switch (typeStringVal.ToLower())
+                                        {
+                                            case "disk":
+                                                Media = Rom.RomTypes.Disk;
+
+                                                inType = typeStringVal;
+                                                break;
+                                            case "disc":
+                                                Media = Rom.RomTypes.Disc;
+
+                                                inType = typeStringVal;
+                                                break;
+                                            case "file":
+                                                Media = Rom.RomTypes.File;
+
+                                                inType = typeStringVal;
+                                                break;
+                                            case "part":
+                                                Media = Rom.RomTypes.Part;
+
+                                                inType = typeStringVal;
+                                                break;
+                                            case "tape":
+                                                Media = Rom.RomTypes.Tape;
+
+                                                inType = typeStringVal;
+                                                break;
+                                            case "of":
+                                                inType = typeStringVal;
+                                                break;
+                                            case "side":
+                                                inType = typeStringVal;
+                                                break;
+                                        }
+                                    }
+                                    else {
+                                        switch (inType.ToLower())
+                                        {
+                                            case "disk":
+                                            case "disc":
+                                            case "file":
+                                            case "part":
+                                            case "tape":
+                                                Number = int.Parse(typeStringVal);
+                                                break;
+                                            case "of":
+                                                Count = int.Parse(typeStringVal);
+                                                break;
+                                            case "side":
+                                                Side = typeStringVal;
+                                                break;
+                                        }
+                                        inType = "";
+                                    }
+                                }
+
+                                break;
+
+                            default:
+                                break;
+
+                        }
+                    }
+
+                    public Rom.RomTypes? Media { get; set; }
+
+                    public int? Number { get; set; }
+
+                    public int? Count { get; set; }
+
+                    public string? Side { get; set; }
+                }
+            }
         }
     }
 }
