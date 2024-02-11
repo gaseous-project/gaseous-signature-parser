@@ -105,15 +105,15 @@ namespace gaseous_signature_parser.classes.parsers
                 RomSignatureObject.Game machineObject = new RomSignatureObject.Game();
                 machineObject.System = "Arcade";
                 machineObject.Roms = new List<RomSignatureObject.Game.Rom>();
-                machineObject.flags = new List<KeyValuePair<string, object>>();
+                machineObject.flags = new Dictionary<string, object>();
 
                 machineObject.Name = xmlMachine.Attributes["name"].Value;
                 
                 if (xmlMachine.Attributes["sourcefile"] != null) {
-                    machineObject.flags.Add(new KeyValuePair<string, object>(
-                        "sourcefile",
-                        xmlMachine.Attributes["sourcefile"].Value
-                    ));
+                    if (!machineObject.flags.ContainsKey("sourcefile"))
+                    {
+                        machineObject.flags.Add("sourcefile", xmlMachine.Attributes["sourcefile"].Value);
+                    }
                 }
 
                 foreach (XmlNode childNode in xmlMachine.ChildNodes)
@@ -134,7 +134,7 @@ namespace gaseous_signature_parser.classes.parsers
 
                         case "rom":
                             RomSignatureObject.Game.Rom rom = new RomSignatureObject.Game.Rom();
-                            rom.Attributes = new List<KeyValuePair<string, object>>();
+                            rom.Attributes = new Dictionary<string, object>();
                             rom.SignatureSource = signatureSource;
                             foreach (XmlAttribute romAttribute in childNode.Attributes)
                             {
@@ -154,11 +154,10 @@ namespace gaseous_signature_parser.classes.parsers
                                         break;
 
                                     default:
-                                        KeyValuePair<string, object> keyValuePair = new KeyValuePair<string, object>( 
-                                            romAttribute.Name,
-                                            childNode.Attributes[romAttribute.Name]?.Value
-                                        );
-                                        rom.Attributes.Add(keyValuePair);
+                                        if (!rom.Attributes.ContainsKey(romAttribute.Name))
+                                        {
+                                            rom.Attributes.Add(romAttribute.Name, childNode.Attributes[romAttribute.Name]?.Value);
+                                        }
                                         break;
                                 }
                             }
@@ -167,10 +166,10 @@ namespace gaseous_signature_parser.classes.parsers
                             break;
 
                         default:
-                            machineObject.flags.Add(new KeyValuePair<string, object>(
-                                childNode.Name,
-                                parser.ConvertXmlNodeToDictionary(childNode)
-                            ));
+                            if (!machineObject.flags.ContainsKey(childNode.Name))
+                            {
+                                machineObject.flags.Add(childNode.Name, parser.ConvertXmlNodeToDictionary(childNode));
+                            }
                             break;
                     }
                 }
@@ -181,23 +180,30 @@ namespace gaseous_signature_parser.classes.parsers
         }
 
         public parser.SignatureParser GetXmlType(XmlDocument xml) {
-            XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
+            try
+            {
+                XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-            if (xmlHeader != null) {
-                if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MAME", StringComparison.OrdinalIgnoreCase)) {
-                    if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Arcade")) {
-                        return parser.SignatureParser.MAMEArcade;
+                if (xmlHeader != null) {
+                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MAME", StringComparison.OrdinalIgnoreCase)) {
+                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Arcade")) {
+                            return parser.SignatureParser.MAMEArcade;
+                        }
+                    }
+
+                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase)) {
+                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Home")) {
+                            return parser.SignatureParser.MAMEMess;
+                        }
                     }
                 }
 
-                if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase)) {
-                    if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Home")) {
-                        return parser.SignatureParser.MAMEMess;
-                    }
-                }
+                return parser.SignatureParser.Unknown;
             }
-
-            return parser.SignatureParser.Unknown;
+            catch
+            {
+                return parser.SignatureParser.Unknown;
+            }
         }
     }
 }

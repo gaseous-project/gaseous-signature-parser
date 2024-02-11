@@ -14,7 +14,7 @@ public class parser
     /// <param name="PathToFile">The full path to the signature file to attempt to parse</param>
     /// <param name="Parser">Which parser to use when parsing the provided signature file</param>
     /// <returns></returns>
-    public RomSignatureObject ParseSignatureDAT(string PathToFile, SignatureParser Parser = SignatureParser.Auto) {
+    public RomSignatureObject ParseSignatureDAT(string PathToFile, string? PathToDBFile = null, SignatureParser Parser = SignatureParser.Auto) {
         SignatureParser DetectedSignatureType = SignatureParser.Auto;
         if (Parser == SignatureParser.Auto) {
             try {
@@ -40,6 +40,11 @@ public class parser
                 classes.parsers.MAMEParser mAMEParser = new classes.parsers.MAMEParser();
 
                 return mAMEParser.Parse(PathToFile, DetectedSignatureType);
+
+            case SignatureParser.NoIntro:
+                classes.parsers.NoIntrosParser noIntrosParser = new classes.parsers.NoIntrosParser();
+
+                return noIntrosParser.Parse(PathToFile, PathToDBFile);
 
             case SignatureParser.Unknown:
             default:
@@ -72,6 +77,13 @@ public class parser
             return mameSigType;
         }
 
+        // check if NoIntro
+        classes.parsers.NoIntrosParser noIntroParser = new classes.parsers.NoIntrosParser();
+        if (noIntroParser.GetXmlType(XmlDoc) == SignatureParser.NoIntro) {
+            Debug.WriteLine("No-Intro: " + PathToFile);
+            return SignatureParser.NoIntro;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -81,6 +93,7 @@ public class parser
         TOSEC = 1,
         MAMEArcade = 2,
         MAMEMess = 3,
+        NoIntro = 4,
         Unknown = 100
     }
 

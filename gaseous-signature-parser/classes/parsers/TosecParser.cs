@@ -355,7 +355,7 @@ namespace gaseous_signature_parser.classes.parsers
 
                         case "rom":
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
-                            romObject.Attributes = new List<KeyValuePair<string, object>>();
+                            romObject.Attributes = new Dictionary<string, object>();
                             if (xmlGameDetail != null)
                             {
                                 romObject.Name = xmlGameDetail.Attributes["name"]?.Value;
@@ -453,10 +453,11 @@ namespace gaseous_signature_parser.classes.parsers
                                                 string[] dTokenCompare = dToken.Split(" ");
                                                 if (dTokenCompare[0].Trim().ToLower().StartsWith("a"))
                                                 {
-                                                    romObject.Attributes.Add(new KeyValuePair<string, object>(
-                                                        "a",
-                                                        dTokenCompare[0].Trim()
-                                                    ));
+                                                    if (!romObject.Attributes.ContainsKey("a"))
+                                                    {
+                                                        romObject.Attributes.Add("a",
+                                                        dTokenCompare[0].Trim());
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -491,10 +492,10 @@ namespace gaseous_signature_parser.classes.parsers
                                                             // known verified dump
                                                             // -------------------
                                                             string shavedToken = dToken.Substring(dTokenCompare[0].Trim().Length).Trim();
-                                                            romObject.Attributes.Add(new KeyValuePair<string, object>(
-                                                                dTokenCompare[0].Trim().ToLower(),
-                                                                shavedToken
-                                                            ));
+                                                            if (!romObject.Attributes.ContainsKey(dTokenCompare[0].Trim().ToLower()))
+                                                            {
+                                                                romObject.Attributes.Add(dTokenCompare[0].Trim().ToLower(), shavedToken);
+                                                            }
                                                             break;
                                                     }
                                                 }
@@ -535,15 +536,22 @@ namespace gaseous_signature_parser.classes.parsers
         }
 
         public parser.SignatureParser GetXmlType(XmlDocument xml) {
-            XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
+            try
+            {
+                XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-            if (xmlHeader != null) {
-                if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase)) {
-                    return parser.SignatureParser.TOSEC;
+                if (xmlHeader != null) {
+                    if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase)) {
+                        return parser.SignatureParser.TOSEC;
+                    }
                 }
-            }
 
-            return parser.SignatureParser.Unknown;
+                return parser.SignatureParser.Unknown;
+            }
+            catch
+            {
+                return parser.SignatureParser.Unknown;
+            }
         }
 	}
 }

@@ -16,7 +16,12 @@
             "stopAtEntry": false,
             "projectPath": "${workspaceFolder}/TestApp/TestApp.csproj",
             "launchConfigurationId": "TargetFramework=;TestApp",
-            "args": ["-tosecpath", "/Volumes/Macintosh HD/Users/michaelgreen/Downloads/TOSEC.2016.11.11.Commodore.C64.AlphaBot/"]
+            "args": [
+                "-datpath",
+                "/Users/michaelgreen/Downloads/No-Intro Love Pack (Standard) (2024-02-09)/No-Intro/",
+                "-dbpath",
+                "/Users/michaelgreen/Downloads/No-Intro Love Pack (DB Export) (2024-02-08)/No-Intro/"
+            ]
         }
     ]
 }
