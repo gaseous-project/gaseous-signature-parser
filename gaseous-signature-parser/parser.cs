@@ -14,7 +14,7 @@ public class parser
     /// <param name="PathToFile">The full path to the signature file to attempt to parse</param>
     /// <param name="Parser">Which parser to use when parsing the provided signature file</param>
     /// <returns></returns>
-    public RomSignatureObject ParseSignatureDAT(string PathToFile, SignatureParser Parser = SignatureParser.Auto) {
+    public RomSignatureObject ParseSignatureDAT(string PathToFile, string? PathToDBFile = null, SignatureParser Parser = SignatureParser.Auto) {
         SignatureParser DetectedSignatureType = SignatureParser.Auto;
         if (Parser == SignatureParser.Auto) {
             try {
@@ -44,7 +44,7 @@ public class parser
             case SignatureParser.NoIntro:
                 classes.parsers.NoIntrosParser noIntrosParser = new classes.parsers.NoIntrosParser();
 
-                return noIntrosParser.Parse(PathToFile);
+                return noIntrosParser.Parse(PathToFile, PathToDBFile);
 
             case SignatureParser.Unknown:
             default:

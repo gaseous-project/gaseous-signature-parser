@@ -42,7 +42,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
             public string? Language { get; set; }
             public string? Copyright { get; set; }
             public List<Rom> Roms { get; set; } = new List<Rom>();
-            public List<KeyValuePair<string, object>> flags { get; set; } = new List<KeyValuePair<string, object>>();
+            public Dictionary<string, object> flags { get; set; } = new Dictionary<string, object>();
             public int RomCount
             {
                 get
@@ -72,7 +72,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                 public string? DevelopmentStatus { get; set; }
 
-                public List<KeyValuePair<string, object>> Attributes { get; set; } = new List<KeyValuePair<string, object>>();
+                public Dictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
                 public RomTypes RomType { get; set; }
                 public string? RomTypeMedia { get; set; }

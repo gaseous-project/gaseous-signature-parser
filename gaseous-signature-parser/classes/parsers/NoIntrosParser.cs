@@ -13,7 +13,7 @@ namespace gaseous_signature_parser.classes.parsers
 
         }
 
-		public RomSignatureObject Parse(string XMLFile)
+		public RomSignatureObject Parse(string XMLFile, string? dbXMLFile)
 		{
             // get hashes of NoIntros file
             var xmlStream = File.OpenRead(XMLFile);
@@ -88,16 +88,12 @@ namespace gaseous_signature_parser.classes.parsers
                 }
             }
 
-            // check for NoIntros DB file
-            string dbFileName = noIntrosObject.Name + " (DB Export) (" + noIntrosObject.Version + ").xml";
-            string dbPathName = Path.Combine(Path.GetDirectoryName(XMLFile), dbFileName);
-
             XmlDocument? noIntroDbXmlDoc;
-            if (File.Exists(dbPathName))
+            if (File.Exists(dbXMLFile))
             {
                 // load NoIntros file
                 noIntroDbXmlDoc = new XmlDocument();
-                noIntroDbXmlDoc.Load(dbPathName);
+                noIntroDbXmlDoc.Load(dbXMLFile);
             }
             else
             {
@@ -111,7 +107,7 @@ namespace gaseous_signature_parser.classes.parsers
             {
                 RomSignatureObject.Game gameObject = new RomSignatureObject.Game();
 
-                gameObject.Id = xmlGame.Attributes["id"].Value;
+                gameObject.Id = long.Parse(xmlGame.Attributes["id"].Value).ToString();
 
                 gameObject.System = SystemName;
 
@@ -138,9 +134,13 @@ namespace gaseous_signature_parser.classes.parsers
                             gameObject.Description = xmlGameDetail.InnerText;
                             break;
 
+                        case "game_id":
+                            gameObject.GameId = xmlGameDetail.InnerText;
+                            break;
+
                         case "rom":
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
-                            romObject.Attributes = new List<KeyValuePair<string, object>>();
+                            romObject.Attributes = new Dictionary<string, object>();
                             if (xmlGameDetail != null)
                             {
                                 romObject.Name = xmlGameDetail.Attributes["name"]?.Value;
@@ -161,6 +161,21 @@ namespace gaseous_signature_parser.classes.parsers
                                 if (noIntroDbXmlDoc != null)
                                 {
                                     RomSignatureObject.Game dbGame = SearchDB(noIntroDbXmlDoc, romObject.Md5, romObject.Sha1);
+                                    if (dbGame != null)
+                                    {
+                                        if (dbGame.Roms.Count > 0)
+                                        {
+                                            // a match was found in the db - copy the contents over the top of the currently built object
+                                            gameObject.GameId = dbGame.GameId;
+                                            gameObject.Category = dbGame.Category;
+                                            gameObject.Name = dbGame.Name;
+                                            gameObject.Country = dbGame.Country;
+                                            gameObject.Language = dbGame.Language;
+                                            gameObject.flags = dbGame.flags;
+
+                                            romObject = dbGame.Roms[0];
+                                        }
+                                    }
                                 }
                             }
 
@@ -256,6 +271,12 @@ namespace gaseous_signature_parser.classes.parsers
                                                 MediaData = attribute.Value;
                                                 break;
 
+                                            default:
+                                                if (!game.flags.ContainsKey(xmlGameItem.Name + "." + attribute.Name))
+                                                {
+                                                    game.flags.Add(xmlGameItem.Name + "." + attribute.Name, attribute.Value);
+                                                }
+                                                break;
                                         }
                                     }
                                     break;
@@ -270,12 +291,23 @@ namespace gaseous_signature_parser.classes.parsers
                                         switch (xmlSource.Name.ToLower())
                                         {
                                             case "details":
-                                                break;
-
                                             case "serials":
+                                                foreach (XmlAttribute detailAttribute in xmlSource.Attributes)
+                                                {
+                                                    switch (detailAttribute.Name.ToLower())
+                                                    {
+                                                        default:
+                                                            if (!rom.Attributes.ContainsKey(xmlSource.Name + "." + detailAttribute.Name))
+                                                            {
+                                                                rom.Attributes.Add(xmlSource.Name + "." + detailAttribute.Name, detailAttribute.Value);
+                                                            }
+                                                            break;
+                                                    }
+                                                }
                                                 break;
 
                                             case "file":
+                                                bool forceNamePresent = false;
                                                 foreach (XmlAttribute fileAttribute in xmlSource.Attributes)
                                                 {
                                                     switch (fileAttribute.Name.ToLower())
@@ -285,14 +317,22 @@ namespace gaseous_signature_parser.classes.parsers
                                                             break;
 
                                                         case "extension":
-                                                            if (NameOverwritten == true && MediaData.Length > 0)
+                                                            if (forceNamePresent == false)
                                                             {
-                                                                rom.Name = game.Name + " (" + MediaData + ")." + fileAttribute.Value;
+                                                                if (NameOverwritten == true && MediaData.Length > 0)
+                                                                {
+                                                                    rom.Name = game.Name + " (" + MediaData + ")." + fileAttribute.Value;
+                                                                }
+                                                                else
+                                                                {
+                                                                    rom.Name = game.Name + "." + fileAttribute.Value;
+                                                                }
                                                             }
-                                                            else
-                                                            {
-                                                                rom.Name = game.Name + "." + fileAttribute.Value;
-                                                            }
+                                                            break;
+                                                        
+                                                        case "forcename":
+                                                            rom.Name = fileAttribute.Value;
+                                                            forceNamePresent = true;
                                                             break;
 
                                                         case "size":
@@ -310,6 +350,14 @@ namespace gaseous_signature_parser.classes.parsers
                                                         case "sha1":
                                                             rom.Sha1 = fileAttribute.Value;
                                                             break;
+
+                                                        default:
+                                                            if (!rom.Attributes.ContainsKey(xmlSource.Name + "." + fileAttribute.Name))
+                                                            {
+                                                                rom.Attributes.Add(xmlSource.Name + "." + fileAttribute.Name, fileAttribute.Value);
+                                                            }
+                                                            break;
+
                                                     }
                                                 }
                                                 break;

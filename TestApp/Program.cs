@@ -10,7 +10,8 @@ using gaseous_signature_parser;
 string[] commandLineArgs = Environment.GetCommandLineArgs();
 
 string scanPath = "./";
-string tosecXML = "";
+string datPath = "";
+string? dbPath = null;
 
 string inArgument = "";
 foreach (string commandLineArg in commandLineArgs)
@@ -21,10 +22,10 @@ foreach (string commandLineArg in commandLineArgs)
         {
             switch (commandLineArg.ToLower())
             {
+                
                 case "-scanpath":
-                    inArgument = commandLineArg.ToLower();
-                    break;
-                case "-tosecpath":
+                case "-datpath":
+                case "-dbpath":
                     inArgument = commandLineArg.ToLower();
                     break;
                 default:
@@ -38,8 +39,11 @@ foreach (string commandLineArg in commandLineArgs)
                 case "-scanpath":
                     scanPath = commandLineArg;
                     break;
-                case "-tosecpath":
-                    tosecXML = commandLineArg;
+                case "-datpath":
+                    datPath = commandLineArg;
+                    break;
+                case "-dbpath":
+                    dbPath = commandLineArg;
                     break;
                 default:
                     break;
@@ -55,29 +59,55 @@ Console.WriteLine("ROM search path: " + scanPath);
 List<RomSignatureObject> romSignatures = new List<RomSignatureObject>();
 System.Collections.ArrayList availablePlatforms = new System.Collections.ArrayList();
 
-// load TOSEC XML files
-if (tosecXML != null && tosecXML.Length > 0)
+// load DAT XML files
+if (datPath != null && datPath.Length > 0)
 {
-    tosecXML = Path.GetFullPath(tosecXML);
-    Console.WriteLine("TOSEC is enabled");
-    Console.WriteLine("TOSEC XML search path: " + tosecXML);
-
-    string[] tosecPathContents = Directory.GetFiles(tosecXML, "*.dat");
-    int lastCLILineLength = 0;
-    for (UInt16 i = 0; i < tosecPathContents.Length; ++i)
+    datPath = Path.GetFullPath(datPath);
+    Console.WriteLine("DATs are enabled");
+    Console.WriteLine("DAT XML search path: " + datPath);
+    if (dbPath != null)
     {
-        string tosecXMLFile = tosecPathContents[i];
+        Console.WriteLine("DB XML search path: "  + dbPath);
+    }
 
+    string[] datPathContents = Directory.GetFiles(datPath, "*.dat");
+    string[] dbPathContents = new string[0];
+    if (dbPath != null)
+    {
+        dbPathContents = Directory.GetFiles(dbPath, "*.xml");
+    }
+
+    int lastCLILineLength = 0;
+    for (UInt16 i = 0; i < datPathContents.Length; ++i)
+    {
+        string datPathFile = datPathContents[i];
+        
         parser Parser = new parser();
         try {
-            RomSignatureObject tosecObject = Parser.ParseSignatureDAT(tosecXMLFile);
+            string? dbPathFile = null;
+            string dbPathName = "";
+            if (dbPathContents.Length > 0)
+            {
+                foreach (string dbFile in dbPathContents)
+                {
+                    string testFileName = Path.GetFileNameWithoutExtension(dbFile.Replace(" (DB Export)", ""));
+                    if (testFileName == Path.GetFileNameWithoutExtension(datPathFile))
+                    {
+                        // match!
+                        dbPathFile = dbFile;
+                        dbPathName = Path.GetFileName(dbFile);
+                    }
+                }
+            }
 
-            if (tosecObject != null) {
-                string statusOutput = i + " / " + tosecPathContents.Length + " : " + Path.GetFileName(tosecXMLFile);
+            RomSignatureObject datObject = Parser.ParseSignatureDAT(datPathFile, dbPathFile);
+
+            if (datObject != null) {
+                string statusOutput = (i + 1) + " / " + datPathContents.Length + " : " + Path.GetFileName(datPathFile) + " " + dbPathName;
                 Console.Write("\r " + statusOutput.PadRight(lastCLILineLength, ' ') + "\r");
                 lastCLILineLength = statusOutput.Length;
 
-                foreach (RomSignatureObject.Game gameRom in tosecObject.Games)
+                foreach (RomSignatureObject.Game gameRom in datObject.Games)
                 {
                     if (!availablePlatforms.Contains(gameRom.System))
                     {
@@ -85,7 +115,7 @@ if (tosecXML != null && tosecXML.Length > 0)
                     }
                 }
 
-                romSignatures.Add(tosecObject);
+                romSignatures.Add(datObject);
             }
         }
         catch {
@@ -95,9 +125,9 @@ if (tosecXML != null && tosecXML.Length > 0)
     Console.WriteLine("");
 } else
 {
-    Console.WriteLine("TOSEC is disabled.");
+    Console.WriteLine("DATs are disabled.");
 }
-Console.WriteLine(romSignatures.Count + " TOSEC files loaded");
+Console.WriteLine(romSignatures.Count + " DAT files loaded");
 
 // Summarise signatures
 if (availablePlatforms.Count > 0)
@@ -127,9 +157,9 @@ foreach (string romFile in romPathContents)
     string sha1Hash = BitConverter.ToString(sha1HashByte).Replace("-", "").ToLowerInvariant();
 
     bool gameFound = false;
-    foreach (RomSignatureObject tosecList in romSignatures)
+    foreach (RomSignatureObject datList in romSignatures)
     {
-        foreach (RomSignatureObject.Game gameObject in tosecList.Games)
+        foreach (RomSignatureObject.Game gameObject in datList.Games)
         {
             foreach (RomSignatureObject.Game.Rom romObject in gameObject.Roms)
             {
@@ -170,7 +200,7 @@ foreach (string romFile in romPathContents)
     }
     if (gameFound == false)
     {
-        Console.WriteLine("File not found in TOSEC library");
+        Console.WriteLine("File not found in DAT library");
     }
 }
 
