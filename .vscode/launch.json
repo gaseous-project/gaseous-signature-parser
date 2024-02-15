@@ -18,9 +18,9 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "/Users/michaelgreen/Downloads/No-Intro Love Pack (Standard) (2024-02-09)/No-Intro/",
+                "/Users/michaelgreen/.hasheous-server/Data/Signatures/NoIntro/DAT/",
                 "-dbpath",
-                "/Users/michaelgreen/Downloads/No-Intro Love Pack (DB Export) (2024-02-08)/No-Intro/"
+                "/Users/michaelgreen/.hasheous-server/Data/Signatures/NoIntro/DB/"
             ]
         }
     ]
