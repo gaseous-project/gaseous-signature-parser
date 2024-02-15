@@ -106,8 +106,19 @@ namespace gaseous_signature_parser.classes.parsers
             foreach (XmlNode xmlGame in xmlGames)
             {
                 RomSignatureObject.Game gameObject = new RomSignatureObject.Game();
-
-                gameObject.Id = long.Parse(xmlGame.Attributes["id"].Value).ToString();
+                if (long.TryParse(xmlGame.Attributes["id"].Value, out _) == true)
+                {
+                    gameObject.Id = long.Parse(xmlGame.Attributes["id"].Value).ToString();   
+                }
+                else
+                {
+                    // string is not a valid int - convert each char to it's ascii code and make a new int from that
+                    gameObject.Id = 0.ToString();
+                    foreach (char c in xmlGame.Attributes["id"].Value)
+                    {
+                        gameObject.Id = (Convert.ToInt64(c) + Convert.ToInt64(gameObject.Id)).ToString();
+                    }
+                }
 
                 gameObject.System = SystemName;
 
