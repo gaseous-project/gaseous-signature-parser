@@ -76,7 +76,8 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                 public RomTypes RomType { get; set; }
                 public string? RomTypeMedia { get; set; }
-                public MediaType? MediaDetail {
+                public MediaType? MediaDetail
+                {
                     get
                     {
                         if (RomTypeMedia != null)
@@ -96,10 +97,31 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 public enum SignatureSourceType
                 {
                     None = 0,
+
+                    /// <summary>
+                    /// https://www.tosecdev.org
+                    /// </summary>
                     TOSEC = 1,
+
+                    /// <summary>
+                    /// https://www.progettosnaps.net/index.php
+                    /// </summary>
                     MAMEArcade = 2,
+
+                    /// <summary>
+                    /// https://www.progettosnaps.net/index.php
+                    /// </summary>
                     MAMEMess = 3,
-                    NoIntros = 4
+
+                    /// <summary>
+                    /// https://no-intro.org
+                    /// </summary>
+                    NoIntros = 4,
+
+                    /// <summary>
+                    /// http://redump.org
+                    /// </summary>
+                    Redump = 5
                 }
 
                 public enum RomTypes
@@ -190,7 +212,8 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                                                 break;
                                         }
                                     }
-                                    else {
+                                    else
+                                    {
                                         switch (inType.ToLower())
                                         {
                                             case "disk":
