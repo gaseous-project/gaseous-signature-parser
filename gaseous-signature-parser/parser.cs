@@ -14,22 +14,29 @@ public class parser
     /// <param name="PathToFile">The full path to the signature file to attempt to parse</param>
     /// <param name="Parser">Which parser to use when parsing the provided signature file</param>
     /// <returns></returns>
-    public RomSignatureObject ParseSignatureDAT(string PathToFile, string? PathToDBFile = null, SignatureParser Parser = SignatureParser.Auto) {
+    public RomSignatureObject ParseSignatureDAT(string PathToFile, string? PathToDBFile = null, SignatureParser Parser = SignatureParser.Auto)
+    {
         SignatureParser DetectedSignatureType = SignatureParser.Auto;
-        if (Parser == SignatureParser.Auto) {
-            try {
+        if (Parser == SignatureParser.Auto)
+        {
+            try
+            {
                 Debug.WriteLine("Checking: " + PathToFile);
                 DetectedSignatureType = GetSignatureType(PathToFile);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Debug.WriteLine("Unknown file type");
                 return null;
             }
-        } else {
+        }
+        else
+        {
             DetectedSignatureType = Parser;
         }
 
-        switch (DetectedSignatureType) {
+        switch (DetectedSignatureType)
+        {
             case SignatureParser.TOSEC:
                 classes.parsers.TosecParser tosecParser = new classes.parsers.TosecParser();
 
@@ -46,6 +53,11 @@ public class parser
 
                 return noIntrosParser.Parse(PathToFile, PathToDBFile);
 
+            case SignatureParser.Redump:
+                classes.parsers.RedumpParser redumpParser = new classes.parsers.RedumpParser();
+
+                return redumpParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -53,18 +65,22 @@ public class parser
         }
     }
 
-    private SignatureParser GetSignatureType(string PathToFile) {
+    private SignatureParser GetSignatureType(string PathToFile)
+    {
         XmlDocument XmlDoc = new XmlDocument();
-        try {
+        try
+        {
             XmlDoc.Load(PathToFile);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new Exception("Not an XML file", ex);
         }
 
         // check if TOSEC
         classes.parsers.TosecParser tosecParser = new classes.parsers.TosecParser();
-        if (tosecParser.GetXmlType(XmlDoc) == SignatureParser.TOSEC) {
+        if (tosecParser.GetXmlType(XmlDoc) == SignatureParser.TOSEC)
+        {
             Debug.WriteLine("TOSEC: " + PathToFile);
             return SignatureParser.TOSEC;
         }
@@ -72,35 +88,47 @@ public class parser
         // check if MAMEArcade
         classes.parsers.MAMEParser mAMEArcadeParser = new classes.parsers.MAMEParser();
         SignatureParser mameSigType = mAMEArcadeParser.GetXmlType(XmlDoc);
-        if (mameSigType != SignatureParser.Unknown) {
+        if (mameSigType != SignatureParser.Unknown)
+        {
             Debug.WriteLine(mameSigType.ToString() + ": " + PathToFile);
             return mameSigType;
         }
 
         // check if NoIntro
         classes.parsers.NoIntrosParser noIntroParser = new classes.parsers.NoIntrosParser();
-        if (noIntroParser.GetXmlType(XmlDoc) == SignatureParser.NoIntro) {
+        if (noIntroParser.GetXmlType(XmlDoc) == SignatureParser.NoIntro)
+        {
             Debug.WriteLine("No-Intro: " + PathToFile);
             return SignatureParser.NoIntro;
+        }
+
+        // check if Redump
+        classes.parsers.RedumpParser redumpParser = new classes.parsers.RedumpParser();
+        if (redumpParser.GetXmlType(XmlDoc) == SignatureParser.Redump)
+        {
+            Debug.WriteLine("Redump: " + PathToFile);
+            return SignatureParser.Redump;
         }
 
         // unable to determine type
         return SignatureParser.Unknown;
     }
 
-    public enum SignatureParser {
+    public enum SignatureParser
+    {
         Auto = 0,
         TOSEC = 1,
         MAMEArcade = 2,
         MAMEMess = 3,
         NoIntro = 4,
+        Redump = 5,
         Unknown = 100
     }
 
     public static Dictionary<string, object> ConvertXmlNodeToDictionary(XmlNode node)
     {
         Dictionary<string, object> map = new Dictionary<string, object>();
-        
+
         // get node attributes first
         foreach (XmlAttribute attribute in node.Attributes)
         {
@@ -108,7 +136,8 @@ public class parser
         }
 
         // get children
-        foreach (XmlNode xmlNode in node.ChildNodes) {
+        foreach (XmlNode xmlNode in node.ChildNodes)
+        {
             map.Add(xmlNode.Name, ConvertXmlNodeToDictionary(xmlNode));
         }
 

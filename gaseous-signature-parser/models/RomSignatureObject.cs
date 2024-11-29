@@ -170,6 +170,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                         {
                             case Rom.SignatureSourceType.TOSEC:
                             case Rom.SignatureSourceType.NoIntros:
+                            case Rom.SignatureSourceType.Redump:
                                 string[] typeString = MediaTypeString.Split(" ");
 
                                 string inType = "";

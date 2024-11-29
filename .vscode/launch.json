@@ -18,9 +18,7 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "/Users/michaelgreen/.hasheous-server/Data/Signatures/NoIntro/DAT/",
-                "-dbpath",
-                "/Users/michaelgreen/.hasheous-server/Data/Signatures/NoIntro/DB/"
+                "${env:HOME}/Downloads/dats"
             ]
         }
     ]
