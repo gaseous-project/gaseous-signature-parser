@@ -34,7 +34,7 @@ jobs:
       run: dotnet build --no-restore --configuration Release ./gaseous-signature-parser/gaseous-signature-parser.csproj
     - name: nuget pack
       run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} ./gaseous-signature-parser/gaseous-signature-parser.csproj
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: nuget
         if-no-files-found: error
@@ -46,7 +46,7 @@ jobs:
     needs: [ build ]
     permissions: write-all
     steps:
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         with:
           name: nuget
           path: ${{ env.NuGetDirectory }}
