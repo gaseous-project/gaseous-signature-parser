@@ -121,7 +121,12 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// <summary>
                     /// http://redump.org
                     /// </summary>
-                    Redump = 5
+                    Redump = 5,
+
+                    /// <summary>
+                    /// https://github.com/BlitterStudio/amiberry/blob/master/whdboot/game-data/whdload_db.xml
+                    /// </summary>
+                    WHDLoad = 6
                 }
 
                 public enum RomTypes
