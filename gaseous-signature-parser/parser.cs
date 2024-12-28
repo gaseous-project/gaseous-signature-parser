@@ -58,6 +58,11 @@ public class parser
 
                 return redumpParser.Parse(PathToFile);
 
+            case SignatureParser.WHDLoad:
+                classes.parsers.WHDLoadParser whdloadParser = new classes.parsers.WHDLoadParser();
+
+                return whdloadParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -110,6 +115,14 @@ public class parser
             return SignatureParser.Redump;
         }
 
+        // check if WHDLoad
+        classes.parsers.WHDLoadParser whdloadParser = new classes.parsers.WHDLoadParser();
+        if (whdloadParser.GetXmlType(XmlDoc) == SignatureParser.WHDLoad)
+        {
+            Debug.WriteLine("WHDLoad: " + PathToFile);
+            return SignatureParser.WHDLoad;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -122,6 +135,7 @@ public class parser
         MAMEMess = 3,
         NoIntro = 4,
         Redump = 5,
+        WHDLoad = 6,
         Unknown = 100
     }
 
