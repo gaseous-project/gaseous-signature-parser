@@ -92,18 +92,19 @@ namespace gaseous_signature_parser.classes.parsers
                             }
                         }
 
-                        if (romNode.HasChildNodes)
+                        // process attribute elements
+                        foreach (XmlNode childNode in romNode.ChildNodes)
                         {
-                            Dictionary<string, object> romAttributes = new Dictionary<string, object>();
-                            foreach (XmlNode romChildNode in romNode.ChildNodes)
+                            string childNodeName = $"whdload.{nodeName}";
+                            if (childNode.GetType() == typeof(XmlElement))
                             {
-                                romAttributes.Add(romChildNode.Name, romChildNode.InnerText);
+                                childNodeName = $"{childNodeName}.{childNode.Name}";
+                                rom.Attributes.Add(childNodeName, childNode.InnerText);
                             }
-                            rom.Attributes.Add(nodeName, romAttributes);
-                        }
-                        else
-                        {
-                            rom.Attributes.Add(nodeName, romNode.InnerText);
+                            else
+                            {
+                                rom.Attributes.Add(childNodeName, childNode.InnerText);
+                            }
                         }
                     }
 
