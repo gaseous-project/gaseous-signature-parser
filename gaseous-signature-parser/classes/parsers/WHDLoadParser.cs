@@ -95,7 +95,7 @@ namespace gaseous_signature_parser.classes.parsers
                         // process attribute elements
                         foreach (XmlNode childNode in romNode.ChildNodes)
                         {
-                            string childNodeName = $"whdload.{nodeName}";
+                            string childNodeName = $"{nodeName}";
                             if (childNode.GetType() == typeof(XmlElement))
                             {
                                 childNodeName = $"{childNodeName}.{childNode.Name}";
