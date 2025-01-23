@@ -42,9 +42,6 @@ jobs:
     - uses: actions/attest-build-provenance@v2
       with:
         subject-path: ${{ env.NuGetDirectory }}/*
-    - uses: anchore/sbom-action@v0
-      with:
-        path: ${{ env.NuGetDirectory }}/*
     - uses: actions/upload-artifact@v4
       with:
         name: nuget
