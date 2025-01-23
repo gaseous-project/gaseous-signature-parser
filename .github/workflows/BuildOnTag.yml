@@ -13,6 +13,11 @@ env:
   DOTNET_NOLOGO: true
   NuGetDirectory: ${{ github.workspace}}/nuget
 
+permissions:
+  id-token: write
+  attestations: write
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,12 +39,18 @@ jobs:
       run: dotnet build --no-restore --configuration Release ./gaseous-signature-parser/gaseous-signature-parser.csproj
     - name: nuget pack
       run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} ./gaseous-signature-parser/gaseous-signature-parser.csproj
+    - uses: actions/attest-build-provenance@v2
+      with:
+        subject-path: ${{ env.NuGetDirectory }}/*
+    - uses: anchore/sbom-action@v0
+      with:
+        path: ${{ env.NuGetDirectory }}/*
     - uses: actions/upload-artifact@v4
       with:
         name: nuget
         if-no-files-found: error
         retention-days: 7
-        path: ${{ env.NuGetDirectory }}/*.nupkg
+        path: ${{ env.NuGetDirectory }}/*
   
   deploy_release:
     runs-on: ubuntu-latest
@@ -60,3 +71,8 @@ jobs:
         run: dotnet nuget push "${{ env.NuGetDirectory }}/*.nupkg" --api-key ${{ secrets.NUGETKEY }} --source "github" --skip-duplicate 
       - name: Push to NuGet
         run: dotnet nuget push "${{ env.NuGetDirectory }}/*.nupkg" --api-key ${{secrets.NUGETPUBLISHKEY}} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.NuGetDirectory }}/*
+      
