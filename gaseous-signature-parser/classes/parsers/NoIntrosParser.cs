@@ -7,14 +7,42 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-	public class NoIntrosParser
-	{
-        public NoIntrosParser() {
+    public class NoIntrosParser
+    {
+        public NoIntrosParser()
+        {
 
         }
 
-		public RomSignatureObject Parse(string XMLFile, string? dbXMLFile)
-		{
+        public RomSignatureObject Parse(string XMLFile, string? dbXMLFile)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            // load country list
+            Dictionary<string, string> TOSECCountry = new Dictionary<string, string>();
+            string resourceName = "gaseous_signature_parser.support.parsers.tosec.Country.txt";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                do
+                {
+                    string[] line = reader.ReadLine().Split(",");
+                    TOSECCountry.Add(line[0], line[1]);
+                } while (reader.EndOfStream == false);
+            }
+            // load language list
+            Dictionary<string, string> TOSECLanguage = new Dictionary<string, string>();
+            resourceName = "gaseous_signature_parser.support.parsers.tosec.Language.txt";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                do
+                {
+                    string[] line = reader.ReadLine().Split(",");
+                    TOSECLanguage.Add(line[0], line[1]);
+                } while (reader.EndOfStream == false);
+            }
+
             // get hashes of NoIntros file
             var xmlStream = File.OpenRead(XMLFile);
 
@@ -108,7 +136,7 @@ namespace gaseous_signature_parser.classes.parsers
                 RomSignatureObject.Game gameObject = new RomSignatureObject.Game();
                 if (long.TryParse(xmlGame.Attributes["id"].Value, out _) == true)
                 {
-                    gameObject.Id = long.Parse(xmlGame.Attributes["id"].Value).ToString();   
+                    gameObject.Id = long.Parse(xmlGame.Attributes["id"].Value).ToString();
                 }
                 else
                 {
@@ -221,6 +249,36 @@ namespace gaseous_signature_parser.classes.parsers
 
         private RomSignatureObject.Game SearchDB(XmlDocument dbXml, string? md5, string? sha1)
         {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            // load country list
+            Dictionary<string, string> TOSECCountry = new Dictionary<string, string>();
+            string resourceName = "gaseous_signature_parser.support.parsers.tosec.Country.txt";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                do
+                {
+                    string[] line = reader.ReadLine().Split(",");
+                    TOSECCountry.Add(line[0], line[1]);
+                } while (reader.EndOfStream == false);
+            }
+            // load language list
+            Dictionary<string, string> TOSECLanguage = new Dictionary<string, string>();
+            resourceName = "gaseous_signature_parser.support.parsers.tosec.Language.txt";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                do
+                {
+                    string[] line = reader.ReadLine().Split(",");
+                    TOSECLanguage.Add(line[0], line[1]);
+                } while (reader.EndOfStream == false);
+            }
+
+            Dictionary<string, string>? romCountryList = new Dictionary<string, string>();
+            Dictionary<string, string>? romLanguageList = new Dictionary<string, string>();
+
             XmlNodeList xmlGames = dbXml.DocumentElement.SelectNodes("/datafile/game");
             RomSignatureObject.Game game = new RomSignatureObject.Game();
             game.Roms = new List<RomSignatureObject.Game.Rom>();
@@ -267,11 +325,39 @@ namespace gaseous_signature_parser.classes.parsers
                                                 break;
 
                                             case "region":
-                                                game.Country = attribute.Value;
+                                                string[] countries = attribute.Value.Split("-");
+                                                if (countries.Length > 1)
+                                                {
+                                                    if (TOSECCountry.ContainsKey(countries[0]))
+                                                    {
+                                                        game.CountryString = attribute.Value;
+
+                                                        foreach (string country in countries)
+                                                        {
+                                                            game.Country.Add(country, TOSECCountry[country]);
+                                                            romCountryList.Add(country, TOSECCountry[country]);
+                                                        }
+                                                    }
+                                                }
+
                                                 break;
 
                                             case "languages":
-                                                game.Language = attribute.Value;
+                                                string[] languages = attribute.Value.Split("-");
+                                                if (languages.Length > 1)
+                                                {
+                                                    if (TOSECLanguage.ContainsKey(languages[0]))
+                                                    {
+                                                        game.LanguageString = attribute.Value;
+
+                                                        foreach (string language in languages)
+                                                        {
+                                                            game.Language.Add(language, TOSECLanguage[language]);
+                                                            romLanguageList.Add(language, TOSECLanguage[language]);
+                                                        }
+                                                    }
+                                                }
+
                                                 break;
 
                                             case "categories":
@@ -296,6 +382,9 @@ namespace gaseous_signature_parser.classes.parsers
                                     RomSignatureObject.Game.Rom rom = new RomSignatureObject.Game.Rom();
                                     rom.RomTypeMedia = MediaData;
                                     rom.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.NoIntros;
+
+                                    rom.Country = romCountryList;
+                                    rom.Language = romLanguageList;
 
                                     foreach (XmlNode xmlSource in xmlGameItem.ChildNodes)
                                     {
@@ -340,7 +429,7 @@ namespace gaseous_signature_parser.classes.parsers
                                                                 }
                                                             }
                                                             break;
-                                                        
+
                                                         case "forcename":
                                                             rom.Name = fileAttribute.Value;
                                                             forceNamePresent = true;
@@ -374,7 +463,7 @@ namespace gaseous_signature_parser.classes.parsers
                                                 break;
                                         }
                                     }
-                                    
+
                                     if (rom.Md5 == md5 || rom.Sha1 == sha1)
                                     {
                                         game.Roms.Add(rom);
@@ -391,13 +480,16 @@ namespace gaseous_signature_parser.classes.parsers
             return null;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml) {
+        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        {
             try
             {
                 XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-                if (xmlHeader != null) {
-                    if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("No-Intro", StringComparison.OrdinalIgnoreCase)) {
+                if (xmlHeader != null)
+                {
+                    if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("No-Intro", StringComparison.OrdinalIgnoreCase))
+                    {
                         return parser.SignatureParser.NoIntro;
                     }
                 }
@@ -409,6 +501,6 @@ namespace gaseous_signature_parser.classes.parsers
                 return parser.SignatureParser.Unknown;
             }
         }
-	}
+    }
 }
 

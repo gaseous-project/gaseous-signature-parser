@@ -7,21 +7,22 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-	public class TosecParser
-	{
-        public TosecParser() {
+    public class TosecParser
+    {
+        public TosecParser()
+        {
 
         }
 
-		public RomSignatureObject Parse(string XMLFile)
-		{
+        public RomSignatureObject Parse(string XMLFile)
+        {
             // load resources
             var assembly = Assembly.GetExecutingAssembly();
             // load systems list
             List<string> TOSECSystems = new List<string>();
             var resourceName = "gaseous_signature_parser.support.parsers.tosec.Systems.txt";
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                using (StreamReader reader = new StreamReader(stream))
+            using (StreamReader reader = new StreamReader(stream))
             {
                 TOSECSystems = reader.ReadToEnd().Split(Environment.NewLine).ToList<string>();
             }
@@ -195,6 +196,9 @@ namespace gaseous_signature_parser.classes.parsers
                 // game title should be first item
                 gameObject.Name = gameNameTokens[0].Trim();
 
+                Dictionary<string, string>? romCountryList = new Dictionary<string, string>();
+                Dictionary<string, string>? romLanguageList = new Dictionary<string, string>();
+
                 // game year should be second item
                 if (gameNameTokens.Length >= 2)
                 {
@@ -211,7 +215,8 @@ namespace gaseous_signature_parser.classes.parsers
                             // date is a century
                             gameObject.Year = dateToken;
                             dateFound = true;
-                        } else
+                        }
+                        else
                         {
                             // check for decades
                             for (UInt16 i = 0; i < 10; i++)
@@ -294,6 +299,10 @@ namespace gaseous_signature_parser.classes.parsers
                 UInt16 StartToken = 0;
                 foreach (string rawToken in gameNameTokens)
                 {
+                    if (rawToken.StartsWith("EU"))
+                    {
+                        Console.WriteLine("EU");
+                    }
                     if (StartToken > 2)
                     {
                         string[] tokenSplit = rawToken.Split("[");
@@ -320,15 +329,35 @@ namespace gaseous_signature_parser.classes.parsers
                             }
 
                             // check for country
-                            if (TOSECCountry.ContainsKey(token))
+                            string[] countries = token.Split("-");
+                            if (countries.Length > 0)
                             {
-                                gameObject.Country = token;
+                                if (TOSECCountry.ContainsKey(countries[0]))
+                                {
+                                    gameObject.CountryString = token;
+
+                                    foreach (string country in countries)
+                                    {
+                                        gameObject.Country.Add(country, TOSECCountry[country]);
+                                        romCountryList.Add(country, TOSECCountry[country]);
+                                    }
+                                }
                             }
 
                             // check for language
-                            if (TOSECLanguage.ContainsKey(token))
+                            string[] languages = token.Split("-");
+                            if (languages.Length > 0)
                             {
-                                gameObject.Language = token;
+                                if (TOSECLanguage.ContainsKey(languages[0]))
+                                {
+                                    gameObject.LanguageString = token;
+
+                                    foreach (string language in languages)
+                                    {
+                                        gameObject.Language.Add(language, TOSECLanguage[language]);
+                                        romLanguageList.Add(language, TOSECLanguage[language]);
+                                    }
+                                }
                             }
 
                             // check for copyright
@@ -371,6 +400,9 @@ namespace gaseous_signature_parser.classes.parsers
                                 romObject.Md5 = xmlGameDetail.Attributes["md5"]?.Value;
                                 romObject.Sha1 = xmlGameDetail.Attributes["sha1"]?.Value;
                                 romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.TOSEC;
+
+                                romObject.Country = romCountryList;
+                                romObject.Language = romLanguageList;
 
                                 // parse name
                                 string[] romNameTokens = romDescription.Split("(");
@@ -428,9 +460,9 @@ namespace gaseous_signature_parser.classes.parsers
                                             token != gameObject.Publisher &&
                                             token != gameObject.SystemVariant &&
                                             token != gameObject.Video &&
-                                            token != gameObject.Country &&
+                                            token != gameObject.CountryString &&
                                             token != gameObject.Copyright &&
-                                            token != gameObject.Language &&
+                                            token != gameObject.LanguageString &&
                                             token != romObject.DevelopmentStatus
                                         )
                                        )
@@ -535,13 +567,16 @@ namespace gaseous_signature_parser.classes.parsers
             return tosecObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml) {
+        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        {
             try
             {
                 XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-                if (xmlHeader != null) {
-                    if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase)) {
+                if (xmlHeader != null)
+                {
+                    if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase))
+                    {
                         return parser.SignatureParser.TOSEC;
                     }
                 }
@@ -553,6 +588,6 @@ namespace gaseous_signature_parser.classes.parsers
                 return parser.SignatureParser.Unknown;
             }
         }
-	}
+    }
 }
 

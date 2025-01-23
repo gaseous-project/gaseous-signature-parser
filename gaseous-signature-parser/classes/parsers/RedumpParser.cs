@@ -159,6 +159,9 @@ namespace gaseous_signature_parser.classes.parsers
 
                 gameObject.System = redumpObject.Name;
 
+                Dictionary<string, string>? romCountryList = new Dictionary<string, string>();
+                Dictionary<string, string>? romLanguageList = new Dictionary<string, string>();
+
                 // get the game name
                 foreach (XmlAttribute gameAttribute in xmlGame.Attributes)
                 {
@@ -197,11 +200,6 @@ namespace gaseous_signature_parser.classes.parsers
                             // remove trailing ')'
                             string part = gameNameParts[i].Trim().TrimEnd(')');
 
-                            if (part.StartsWith("Command"))
-                            {
-                                Console.WriteLine("Command");
-                            }
-
                             string[] subParts = part.Split(',');
                             if (subParts.Length > 0)
                             {
@@ -213,7 +211,24 @@ namespace gaseous_signature_parser.classes.parsers
                                         TOSECCountry.Keys.Any(v => v.Equals(subParts[0].Trim(), StringComparison.OrdinalIgnoreCase))
                                         )
                                     {
-                                        gameObject.Country = part.Trim();
+                                        string[] countries = part.Trim().Split("-");
+                                        if (countries.Length > 1)
+                                        {
+                                            if (TOSECCountry.ContainsKey(countries[0]))
+                                            {
+                                                gameObject.CountryString = part.Trim();
+
+                                                foreach (string country in countries)
+                                                {
+                                                    if (TOSECCountry.ContainsKey(country))
+                                                    {
+                                                        gameObject.Country.Add(country, TOSECCountry[country]);
+                                                        romCountryList.Add(country, TOSECCountry[country]);
+                                                    }
+                                                }
+                                            }
+                                        }
+
                                         gameNameParts[i] = "";
                                         countryFound = true;
                                     }
@@ -224,7 +239,25 @@ namespace gaseous_signature_parser.classes.parsers
                                 {
                                     if (TOSECLanguage.Keys.Any(v => v.Equals(subParts[0].Trim(), StringComparison.OrdinalIgnoreCase)))
                                     {
-                                        gameObject.Language = part.Trim();
+                                        string[] languages = part.Trim().Split("-");
+                                        if (languages.Length > 1)
+                                        {
+                                            if (TOSECLanguage.ContainsKey(languages[0]))
+                                            {
+                                                gameObject.LanguageString = part.Trim();
+
+
+                                                foreach (string language in languages)
+                                                {
+                                                    if (TOSECLanguage.ContainsKey(language))
+                                                    {
+                                                        gameObject.Language.Add(language, TOSECLanguage[language]);
+                                                        romLanguageList.Add(language, TOSECLanguage[language]);
+                                                    }
+                                                }
+                                            }
+                                        }
+
                                         gameNameParts[i] = "";
                                         languageFound = true;
                                     }
