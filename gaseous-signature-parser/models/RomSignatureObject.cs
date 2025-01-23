@@ -38,8 +38,10 @@ namespace gaseous_signature_parser.models.RomSignatureObject
             public string? System { get; set; }
             public string? SystemVariant { get; set; }
             public string? Video { get; set; }
-            public string? Country { get; set; }
-            public string? Language { get; set; }
+            public string? CountryString { get; set; }
+            public Dictionary<string, string>? Country { get; set; } = new Dictionary<string, string>();
+            public string? LanguageString { get; set; }
+            public Dictionary<string, string>? Language { get; set; } = new Dictionary<string, string>();
             public string? Copyright { get; set; }
             public List<Rom> Roms { get; set; } = new List<Rom>();
             public Dictionary<string, object> flags { get; set; } = new Dictionary<string, object>();
@@ -69,6 +71,9 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 public string? Crc { get; set; }
                 public string? Md5 { get; set; }
                 public string? Sha1 { get; set; }
+
+                public Dictionary<string, string>? Country { get; set; }
+                public Dictionary<string, string>? Language { get; set; }
 
                 public string? DevelopmentStatus { get; set; }
 
