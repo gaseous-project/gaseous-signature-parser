@@ -134,9 +134,15 @@ namespace gaseous_signature_parser.classes.parsers
             foreach (XmlNode xmlGame in xmlGames)
             {
                 RomSignatureObject.Game gameObject = new RomSignatureObject.Game();
-                if (long.TryParse(xmlGame.Attributes["id"].Value, out _) == true)
+                XmlAttribute idAttribute = xmlGame.Attributes["id"];
+                if (idAttribute == null)
                 {
-                    gameObject.Id = long.Parse(xmlGame.Attributes["id"].Value).ToString();
+                    continue;
+                }
+
+                if (long.TryParse(idAttribute.Value, out _) == true)
+                {
+                    gameObject.Id = long.Parse(idAttribute.Value).ToString();
                 }
                 else
                 {
@@ -185,7 +191,14 @@ namespace gaseous_signature_parser.classes.parsers
                                 romObject.Name = xmlGameDetail.Attributes["name"]?.Value;
                                 if (xmlGameDetail.Attributes["size"]?.Value != null)
                                 {
-                                    romObject.Size = UInt64.Parse(xmlGameDetail.Attributes["size"]?.Value);
+                                    if (UInt64.TryParse(xmlGameDetail.Attributes["size"]?.Value, out _) == true)
+                                    {
+                                        romObject.Size = UInt64.Parse(xmlGameDetail.Attributes["size"]?.Value);
+                                    }
+                                    else
+                                    {
+                                        romObject.Size = 0;
+                                    }
                                 }
                                 else
                                 {

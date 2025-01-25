@@ -18,7 +18,9 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Downloads/TOSEC"
+                "${env:HOME}/Downloads/Signatures/NoIntro/DAT",
+                "-dbpath",
+                "${env:HOME}/Downloads/Signatures/NoIntro/DB"
             ]
         }
     ]

@@ -140,7 +140,15 @@ namespace gaseous_signature_parser.classes.parsers
                     case "url":
                         try
                         {
-                            tosecObject.Url = new Uri(childNode.InnerText);
+                            string uriString = childNode.InnerText;
+                            if (uriString.StartsWith("http://") || uriString.StartsWith("https://"))
+                            {
+                                tosecObject.Url = new Uri(uriString);
+                            }
+                            else
+                            {
+                                tosecObject.Url = new Uri("http://" + uriString);
+                            }
                         }
                         catch
                         {
@@ -338,8 +346,21 @@ namespace gaseous_signature_parser.classes.parsers
 
                                     foreach (string country in countries)
                                     {
-                                        gameObject.Country.Add(country, TOSECCountry[country]);
-                                        romCountryList.Add(country, TOSECCountry[country]);
+                                        if (!gameObject.Country.ContainsKey(country))
+                                        {
+                                            if (TOSECCountry.ContainsKey(country))
+                                            {
+                                                gameObject.Country.Add(country, TOSECCountry[country]);
+                                            }
+                                        }
+
+                                        if (!romCountryList.ContainsKey(country))
+                                        {
+                                            if (TOSECCountry.ContainsKey(country))
+                                            {
+                                                romCountryList.Add(country, TOSECCountry[country]);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -354,8 +375,21 @@ namespace gaseous_signature_parser.classes.parsers
 
                                     foreach (string language in languages)
                                     {
-                                        gameObject.Language.Add(language, TOSECLanguage[language]);
-                                        romLanguageList.Add(language, TOSECLanguage[language]);
+                                        if (!gameObject.Language.ContainsKey(language))
+                                        {
+                                            if (TOSECLanguage.ContainsKey(language))
+                                            {
+                                                gameObject.Language.Add(language, TOSECLanguage[language]);
+                                            }
+                                        }
+
+                                        if (!romLanguageList.ContainsKey(language))
+                                        {
+                                            if (TOSECLanguage.ContainsKey(language))
+                                            {
+                                                romLanguageList.Add(language, TOSECLanguage[language]);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -575,9 +609,16 @@ namespace gaseous_signature_parser.classes.parsers
 
                 if (xmlHeader != null)
                 {
-                    if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase))
+                    if (xmlHeader.SelectSingleNode("category") != null)
                     {
-                        return parser.SignatureParser.TOSEC;
+                        if (xmlHeader.SelectSingleNode("category").InnerText.Equals("TOSEC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return parser.SignatureParser.TOSEC;
+                        }
+                    }
+                    else
+                    {
+                        return parser.SignatureParser.Unknown;
                     }
                 }
 
