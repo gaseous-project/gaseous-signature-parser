@@ -22,7 +22,7 @@ foreach (string commandLineArg in commandLineArgs)
         {
             switch (commandLineArg.ToLower())
             {
-                
+
                 case "-scanpath":
                 case "-datpath":
                 case "-dbpath":
@@ -67,7 +67,7 @@ if (datPath != null && datPath.Length > 0)
     Console.WriteLine("DAT XML search path: " + datPath);
     if (dbPath != null)
     {
-        Console.WriteLine("DB XML search path: "  + dbPath);
+        Console.WriteLine("DB XML search path: " + dbPath);
     }
 
     string[] datPathContents = Directory.GetFiles(datPath, "*.dat");
@@ -81,9 +81,10 @@ if (datPath != null && datPath.Length > 0)
     for (UInt16 i = 0; i < datPathContents.Length; ++i)
     {
         string datPathFile = datPathContents[i];
-        
+
         parser Parser = new parser();
-        try {
+        try
+        {
             string? dbPathFile = null;
             string dbPathName = "";
             if (dbPathContents.Length > 0)
@@ -102,7 +103,8 @@ if (datPath != null && datPath.Length > 0)
 
             RomSignatureObject datObject = Parser.ParseSignatureDAT(datPathFile, dbPathFile);
 
-            if (datObject != null) {
+            if (datObject != null)
+            {
                 string statusOutput = (i + 1) + " / " + datPathContents.Length + " : " + Path.GetFileName(datPathFile) + " " + dbPathName;
                 Console.Write("\r " + statusOutput.PadRight(lastCLILineLength, ' ') + "\r");
                 lastCLILineLength = statusOutput.Length;
@@ -118,12 +120,14 @@ if (datPath != null && datPath.Length > 0)
                 romSignatures.Add(datObject);
             }
         }
-        catch {
-            
+        catch
+        {
+
         }
     }
     Console.WriteLine("");
-} else
+}
+else
 {
     Console.WriteLine("DATs are disabled.");
 }
