@@ -131,7 +131,12 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// <summary>
                     /// https://github.com/BlitterStudio/amiberry/blob/master/whdboot/game-data/whdload_db.xml
                     /// </summary>
-                    WHDLoad = 6
+                    WHDLoad = 6,
+
+                    /// <summary>
+                    /// https://retroachievements.org
+                    /// </summary>
+                    RetroAchievements = 7
                 }
 
                 public enum RomTypes

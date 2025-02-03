@@ -20,6 +20,7 @@ EE,Estonia
 EG,Egypt
 ES,Spain
 EU,Europe
+Europe,Europe
 FI,Finland
 FR,France
 GB,United Kingdom
@@ -68,3 +69,4 @@ USA,United States
 VN,Vietnam
 YU,Yugoslavia
 ZA,South Africa
+World,Worldwide
