@@ -18,9 +18,7 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Downloads/Signatures/NoIntro/DAT",
-                "-dbpath",
-                "${env:HOME}/Downloads/Signatures/NoIntro/DB"
+                "${env:HOME}/Downloads/DATS"
             ]
         }
     ]

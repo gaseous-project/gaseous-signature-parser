@@ -63,6 +63,11 @@ public class parser
 
                 return whdloadParser.Parse(PathToFile);
 
+            case SignatureParser.RetroAchievements:
+                classes.parsers.RetroAchievementsParser retroAchievementsParser = new classes.parsers.RetroAchievementsParser();
+
+                return retroAchievementsParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -123,6 +128,14 @@ public class parser
             return SignatureParser.WHDLoad;
         }
 
+        // check if RetroAchievements
+        classes.parsers.RetroAchievementsParser retroAchievementsParser = new classes.parsers.RetroAchievementsParser();
+        if (retroAchievementsParser.GetXmlType(XmlDoc) == SignatureParser.RetroAchievements)
+        {
+            Debug.WriteLine("RetroAchievements: " + PathToFile);
+            return SignatureParser.RetroAchievements;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -136,6 +149,7 @@ public class parser
         NoIntro = 4,
         Redump = 5,
         WHDLoad = 6,
+        RetroAchievements = 7,
         Unknown = 100
     }
 
