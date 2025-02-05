@@ -298,6 +298,7 @@ namespace gaseous_signature_parser.classes.parsers
                             // generate new ROM object
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
                             romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.RetroAchievements;
+                            romObject.Attributes = new Dictionary<string, object>();
 
                             // get the ROM data
                             foreach (XmlAttribute romAttribute in gameNode.Attributes)
@@ -355,7 +356,6 @@ namespace gaseous_signature_parser.classes.parsers
                                             }
                                         }
 
-
                                         break;
 
                                     case "size":
@@ -372,6 +372,13 @@ namespace gaseous_signature_parser.classes.parsers
 
                                     case "sha1":
                                         romObject.Sha1 = romAttribute.Value;
+                                        break;
+
+                                    default:
+                                        if (romAttribute.Value.Length > 0)
+                                        {
+                                            romObject.Attributes.Add(romAttribute.Name, romAttribute.Value);
+                                        }
                                         break;
                                 }
                             }
