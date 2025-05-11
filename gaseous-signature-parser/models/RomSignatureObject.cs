@@ -136,7 +136,12 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// <summary>
                     /// https://retroachievements.org
                     /// </summary>
-                    RetroAchievements = 7
+                    RetroAchievements = 7,
+
+                    /// <summary>
+                    /// https://github.com/libretro/FBNeo/tree/master/dats
+                    /// </summary>
+                    FBNeo = 8
                 }
 
                 public enum RomTypes

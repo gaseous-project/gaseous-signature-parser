@@ -68,6 +68,11 @@ public class parser
 
                 return retroAchievementsParser.Parse(PathToFile);
 
+            case SignatureParser.FBNeo:
+                classes.parsers.FBNeoParser fbNeoParser = new classes.parsers.FBNeoParser();
+
+                return fbNeoParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -136,6 +141,14 @@ public class parser
             return SignatureParser.RetroAchievements;
         }
 
+        // check if FBNeo
+        classes.parsers.FBNeoParser fbNeoParser = new classes.parsers.FBNeoParser();
+        if (fbNeoParser.GetXmlType(XmlDoc) == SignatureParser.FBNeo)
+        {
+            Debug.WriteLine("FBNeo: " + PathToFile);
+            return SignatureParser.FBNeo;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -150,6 +163,7 @@ public class parser
         Redump = 5,
         WHDLoad = 6,
         RetroAchievements = 7,
+        FBNeo = 8,
         Unknown = 100
     }
 
@@ -158,15 +172,21 @@ public class parser
         Dictionary<string, object> map = new Dictionary<string, object>();
 
         // get node attributes first
-        foreach (XmlAttribute attribute in node.Attributes)
+        if (node.Attributes != null)
         {
-            map.Add(attribute.Name, attribute.Value);
+            foreach (XmlAttribute attribute in node.Attributes)
+            {
+                map.Add(attribute.Name, attribute.Value);
+            }
         }
 
         // get children
-        foreach (XmlNode xmlNode in node.ChildNodes)
+        if (node.ChildNodes != null && node.ChildNodes.Count > 0)
         {
-            map.Add(xmlNode.Name, ConvertXmlNodeToDictionary(xmlNode));
+            foreach (XmlNode xmlNode in node.ChildNodes)
+            {
+                map.Add(xmlNode.Name, ConvertXmlNodeToDictionary(xmlNode));
+            }
         }
 
         return map;
