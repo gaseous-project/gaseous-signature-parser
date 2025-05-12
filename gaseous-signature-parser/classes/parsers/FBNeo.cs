@@ -18,17 +18,6 @@ namespace gaseous_signature_parser.classes.parsers
 
         public RomSignatureObject Parse(string XMLFile)
         {
-            // load resources
-            var assembly = Assembly.GetExecutingAssembly();
-            // load systems list
-            List<string> FBNeoLanguages = new List<string>();
-            var resourceName = "gaseous_signature_parser.support.parsers.tosec.Language.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                FBNeoLanguages = reader.ReadToEnd().Split(Environment.NewLine).ToList<string>();
-            }
-
             // get hashes of provided file
             var xmlStream = File.OpenRead(XMLFile);
 
@@ -105,14 +94,22 @@ namespace gaseous_signature_parser.classes.parsers
             foreach (XmlNode xmlMachine in xmlMachines)
             {
                 RomSignatureObject.Game machineObject = new RomSignatureObject.Game();
+                string systemName = signatureObject.Name;
                 if (signatureObject.Name.Contains(" - "))
                 {
-                    machineObject.Name = signatureObject.Name.Split(" - ")[0];
+                    string[] sigNameParts = signatureObject.Name.Split(" - ");
+                    if (sigNameParts.Length > 1)
+                    {
+                        systemName = sigNameParts[1];
+                    }
                 }
-                else
+                // strip " Games" from the end of systemName
+                if (systemName.EndsWith(" Games"))
                 {
-                    machineObject.Name = signatureObject.Name;
+                    systemName = systemName.Substring(0, systemName.Length - 6);
                 }
+                machineObject.System = systemName.Trim();
+
                 machineObject.Roms = new List<RomSignatureObject.Game.Rom>();
                 machineObject.flags = new Dictionary<string, object>();
                 machineObject.Language = new Dictionary<string, string>();
@@ -144,17 +141,16 @@ namespace gaseous_signature_parser.classes.parsers
                                 // split the details by comma
                                 string[] detailsParts = titleDetails.Split(new string[] { "," }, StringSplitOptions.None);
 
-                                // check if any of the details are in the language list
+                                // check if any of the details are in the country list
                                 foreach (string detail in detailsParts)
                                 {
                                     string trimmedDetail = detail.Trim();
-                                    foreach (string language in FBNeoLanguages)
+                                    KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(trimmedDetail);
+                                    if (countryItem != null)
                                     {
-                                        if (trimmedDetail.Equals(language, StringComparison.OrdinalIgnoreCase))
+                                        if (countryItem.HasValue && !machineObject.Country.ContainsKey(countryItem.Value.Key))
                                         {
-                                            string[] languageParts = language.Split(new string[] { " " }, StringSplitOptions.None);
-                                            machineObject.Language.Add(languageParts[0].Trim(), languageParts[1].Trim());
-                                            break;
+                                            machineObject.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
                                         }
                                     }
                                 }

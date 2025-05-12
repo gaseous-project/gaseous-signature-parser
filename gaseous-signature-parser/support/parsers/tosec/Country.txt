@@ -20,7 +20,8 @@ EE,Estonia
 EG,Egypt
 ES,Spain
 EU,Europe
-Europe,Europe
+Europe,Europe|EU
+Euro,Europe|EU
 FI,Finland
 FR,France
 GB,United Kingdom
@@ -63,9 +64,9 @@ SK,Slovakia
 TH,Thailand
 TR,Turkey
 TW,Taiwan
-UK,United Kingdom
+UK,United Kingdom|GB
 US,United States
-USA,United States
+USA,United States|US
 VN,Vietnam
 YU,Yugoslavia
 ZA,South Africa

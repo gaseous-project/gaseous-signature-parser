@@ -16,33 +16,6 @@ namespace gaseous_signature_parser.classes.parsers
 
         public RomSignatureObject Parse(string XMLFile, string? dbXMLFile)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            // load country list
-            Dictionary<string, string> TOSECCountry = new Dictionary<string, string>();
-            string resourceName = "gaseous_signature_parser.support.parsers.tosec.Country.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECCountry.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-            // load language list
-            Dictionary<string, string> TOSECLanguage = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.Language.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECLanguage.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-
             // get hashes of NoIntros file
             var xmlStream = File.OpenRead(XMLFile);
 
@@ -262,37 +235,10 @@ namespace gaseous_signature_parser.classes.parsers
 
         private RomSignatureObject.Game SearchDB(XmlDocument dbXml, string? md5, string? sha1)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            // load country list
-            Dictionary<string, string> TOSECCountry = new Dictionary<string, string>();
-            string resourceName = "gaseous_signature_parser.support.parsers.tosec.Country.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECCountry.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-            // load language list
-            Dictionary<string, string> TOSECLanguage = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.Language.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECLanguage.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-
             Dictionary<string, string>? romCountryList = new Dictionary<string, string>();
             Dictionary<string, string>? romLanguageList = new Dictionary<string, string>();
 
-            XmlNodeList xmlGames = dbXml.DocumentElement.SelectNodes("/datafile/game");
+            XmlNodeList xmlGames = dbXml.DocumentElement.SelectNodes($"/datafile/game[source/file[@md5='{md5}' or @sha1='{sha1}']]");
             RomSignatureObject.Game game = new RomSignatureObject.Game();
             game.Roms = new List<RomSignatureObject.Game.Rom>();
 
@@ -338,35 +284,52 @@ namespace gaseous_signature_parser.classes.parsers
                                                 break;
 
                                             case "region":
-                                                string[] countries = attribute.Value.Split("-");
-                                                if (countries.Length > 1)
+                                                string[] countries = attribute.Value.Split(",");
+                                                if (game.Country == null)
                                                 {
-                                                    if (TOSECCountry.ContainsKey(countries[0]))
+                                                    game.Country = new Dictionary<string, string>();
+                                                }
+                                                if (countries != null)
+                                                {
+                                                    foreach (string country in countries)
                                                     {
-                                                        game.CountryString = attribute.Value;
-
-                                                        foreach (string country in countries)
+                                                        KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(country.Trim());
+                                                        if (countryItem != null)
                                                         {
-                                                            game.Country.Add(country, TOSECCountry[country]);
-                                                            romCountryList.Add(country, TOSECCountry[country]);
+                                                            if (!game.Country.ContainsKey(countryItem.Value.Key))
+                                                            {
+                                                                game.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                                            }
+                                                            if (!romCountryList.ContainsKey(countryItem.Value.Key))
+                                                            {
+                                                                romCountryList.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                                            }
                                                         }
                                                     }
                                                 }
-
                                                 break;
 
                                             case "languages":
-                                                string[] languages = attribute.Value.Split("-");
-                                                if (languages.Length > 1)
+                                                string[] languages = attribute.Value.Split(",");
+                                                if (game.Language == null)
                                                 {
-                                                    if (TOSECLanguage.ContainsKey(languages[0]))
+                                                    game.Language = new Dictionary<string, string>();
+                                                }
+                                                if (languages != null)
+                                                {
+                                                    foreach (string language in languages)
                                                     {
-                                                        game.LanguageString = attribute.Value;
-
-                                                        foreach (string language in languages)
+                                                        KeyValuePair<string, string>? languageItem = LanguageLookup.ParseLanguageString(language.Trim());
+                                                        if (languageItem != null)
                                                         {
-                                                            game.Language.Add(language, TOSECLanguage[language]);
-                                                            romLanguageList.Add(language, TOSECLanguage[language]);
+                                                            if (!game.Language.ContainsKey(languageItem.Value.Key))
+                                                            {
+                                                                game.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                                            }
+                                                            if (!romLanguageList.ContainsKey(languageItem.Value.Key))
+                                                            {
+                                                                romLanguageList.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                                            }
                                                         }
                                                     }
                                                 }

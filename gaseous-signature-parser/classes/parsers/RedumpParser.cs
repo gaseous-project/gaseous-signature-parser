@@ -34,30 +34,6 @@ namespace gaseous_signature_parser.classes.parsers
             {
                 TOSECVideo = reader.ReadToEnd().Split(Environment.NewLine).ToList<string>();
             }
-            // load country list
-            Dictionary<string, string> TOSECCountry = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.Country.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECCountry.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-            // load language list
-            Dictionary<string, string> TOSECLanguage = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.Language.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECLanguage.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
             // load copyright list
             Dictionary<string, string> TOSECCopyright = new Dictionary<string, string>();
             resourceName = "gaseous_signature_parser.support.parsers.tosec.Copyright.txt";
@@ -206,80 +182,80 @@ namespace gaseous_signature_parser.classes.parsers
                                 // check if this is a country
                                 if (countryFound == false)
                                 {
-                                    if (
-                                        TOSECCountry.Values.Any(v => v.Equals(subParts[0].Trim(), StringComparison.OrdinalIgnoreCase)) ||
-                                        TOSECCountry.Keys.Any(v => v.Equals(subParts[0].Trim(), StringComparison.OrdinalIgnoreCase))
-                                        )
+                                    string[] countries = part.Trim().Split("-");
+                                    if (gameObject.Country == null)
                                     {
-                                        string[] countries = part.Trim().Split("-");
-                                        if (countries.Length > 1)
+                                        gameObject.Country = new Dictionary<string, string>();
+                                    }
+                                    if (countries != null)
+                                    {
+                                        foreach (string country in countries)
                                         {
-                                            if (TOSECCountry.ContainsKey(countries[0]))
+                                            KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(country);
+                                            if (countryItem != null)
                                             {
-                                                gameObject.CountryString = part.Trim();
-
-                                                foreach (string country in countries)
+                                                if (!gameObject.Country.ContainsKey(countryItem.Value.Key))
                                                 {
-                                                    if (TOSECCountry.ContainsKey(country))
-                                                    {
-                                                        gameObject.Country.Add(country, TOSECCountry[country]);
-                                                        romCountryList.Add(country, TOSECCountry[country]);
-                                                    }
+                                                    gameObject.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                                }
+                                                if (!romCountryList.ContainsKey(countryItem.Value.Key))
+                                                {
+                                                    romCountryList.Add(countryItem.Value.Key, countryItem.Value.Value);
                                                 }
                                             }
+                                            gameNameParts[i] = "";
+                                            countryFound = true;
                                         }
-
-                                        gameNameParts[i] = "";
-                                        countryFound = true;
                                     }
                                 }
+                            }
 
-                                // check if this is a language
-                                if (languageFound == false)
+                            // check if this is a language
+                            if (languageFound == false)
+                            {
+                                string[] languages = part.Trim().Split(",");
+                                if (gameObject.Language == null)
                                 {
-                                    if (TOSECLanguage.Keys.Any(v => v.Equals(subParts[0].Trim(), StringComparison.OrdinalIgnoreCase)))
+                                    gameObject.Language = new Dictionary<string, string>();
+                                }
+                                if (languages != null)
+                                {
+                                    foreach (string language in languages)
                                     {
-                                        string[] languages = part.Trim().Split("-");
-                                        if (languages.Length > 1)
+                                        KeyValuePair<string, string>? languageItem = LanguageLookup.ParseLanguageString(language);
+                                        if (languageItem != null)
                                         {
-                                            if (TOSECLanguage.ContainsKey(languages[0]))
+                                            if (!gameObject.Language.ContainsKey(languageItem.Value.Key))
                                             {
-                                                gameObject.LanguageString = part.Trim();
-
-
-                                                foreach (string language in languages)
-                                                {
-                                                    if (TOSECLanguage.ContainsKey(language))
-                                                    {
-                                                        gameObject.Language.Add(language, TOSECLanguage[language]);
-                                                        romLanguageList.Add(language, TOSECLanguage[language]);
-                                                    }
-                                                }
+                                                gameObject.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
                                             }
+                                            if (!romLanguageList.ContainsKey(languageItem.Value.Key))
+                                            {
+                                                romLanguageList.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                            }
+                                            gameNameParts[i] = "";
+                                            languageFound = true;
                                         }
-
-                                        gameNameParts[i] = "";
-                                        languageFound = true;
                                     }
                                 }
+                            }
 
-                                // check if this is a date
-                                if (dateFound == false)
+                            // check if this is a date
+                            if (dateFound == false)
+                            {
+                                if (DateTime.TryParse(subParts[0].Trim(), out DateTime date))
                                 {
-                                    if (DateTime.TryParse(subParts[0].Trim(), out DateTime date))
-                                    {
-                                        gameObject.Year = date.ToString();
-                                        gameNameParts[i] = "";
-                                        dateFound = true;
-                                    }
-                                }
-
-                                // check if this is a demo
-                                if (subParts[0].Trim().StartsWith("demo", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    gameObject.Demo = RomSignatureObject.Game.DemoTypes.demo;
+                                    gameObject.Year = date.ToString();
                                     gameNameParts[i] = "";
+                                    dateFound = true;
                                 }
+                            }
+
+                            // check if this is a demo
+                            if (subParts[0].Trim().StartsWith("demo", StringComparison.OrdinalIgnoreCase))
+                            {
+                                gameObject.Demo = RomSignatureObject.Game.DemoTypes.demo;
+                                gameNameParts[i] = "";
                             }
                         }
                     }

@@ -9,13 +9,15 @@ using System.Diagnostics;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class MAMEParser {
-        public MAMEParser() {
-            
+    public class MAMEParser
+    {
+        public MAMEParser()
+        {
+
         }
 
         public RomSignatureObject Parse(string XMLFile, parser.SignatureParser DocumentType)
-		{
+        {
             // get hashes of provided file
             var xmlStream = File.OpenRead(XMLFile);
 
@@ -33,12 +35,12 @@ namespace gaseous_signature_parser.classes.parsers
 
             // get document type - need to know if it's MAME arcade, mess, etc
             RomSignatureObject.Game.Rom.SignatureSourceType signatureSource = new RomSignatureObject.Game.Rom.SignatureSourceType();
-            switch (DocumentType) 
+            switch (DocumentType)
             {
                 case parser.SignatureParser.MAMEArcade:
                     signatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.MAMEArcade;
                     break;
-                
+
                 case parser.SignatureParser.MAMEMess:
                     signatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.MAMEMess;
                     break;
@@ -48,11 +50,11 @@ namespace gaseous_signature_parser.classes.parsers
             RomSignatureObject signatureObject = new RomSignatureObject();
 
             // read header
-            XmlNode xmlHeader = xmlDocument.DocumentElement.SelectSingleNode("/datafile/header");;
+            XmlNode xmlHeader = xmlDocument.DocumentElement.SelectSingleNode("/datafile/header"); ;
             signatureObject.SourceType = DocumentType.ToString();
             signatureObject.SourceMd5 = md5Hash;
             signatureObject.SourceSHA1 = sha1Hash;
-            foreach (XmlNode xmlNode in xmlHeader.ChildNodes) 
+            foreach (XmlNode xmlNode in xmlHeader.ChildNodes)
             {
                 switch (xmlNode.Name.ToLower())
                 {
@@ -79,7 +81,7 @@ namespace gaseous_signature_parser.classes.parsers
                     case "email":
                         signatureObject.Email = xmlNode.InnerText;
                         break;
-                    
+
                     case "homepage":
                         signatureObject.Homepage = xmlNode.InnerText;
                         break;
@@ -106,10 +108,14 @@ namespace gaseous_signature_parser.classes.parsers
                 machineObject.System = "Arcade";
                 machineObject.Roms = new List<RomSignatureObject.Game.Rom>();
                 machineObject.flags = new Dictionary<string, object>();
+                machineObject.Language = new Dictionary<string, string>();
+                machineObject.Country = new Dictionary<string, string>();
 
                 machineObject.Name = xmlMachine.Attributes["name"].Value;
-                
-                if (xmlMachine.Attributes["sourcefile"] != null) {
+                machineObject.Description = xmlMachine.Attributes["name"].Value;
+
+                if (xmlMachine.Attributes["sourcefile"] != null)
+                {
                     if (!machineObject.flags.ContainsKey("sourcefile"))
                     {
                         machineObject.flags.Add("sourcefile", xmlMachine.Attributes["sourcefile"].Value);
@@ -121,7 +127,37 @@ namespace gaseous_signature_parser.classes.parsers
                     switch (childNode.Name.ToLower())
                     {
                         case "description":
-                            machineObject.Description = childNode.InnerText;
+                            if (childNode.InnerText.Contains("("))
+                            {
+                                string[] nameParts = childNode.InnerText.Split(new string[] { " (" }, StringSplitOptions.None);
+                                machineObject.Name = nameParts[0].Trim();
+                                if (nameParts.Length == 1)
+                                {
+                                    break;
+                                }
+                                string titleDetails = nameParts[1].TrimEnd(')');
+
+                                // split the details by comma
+                                string[] detailsParts = titleDetails.Split(new string[] { "," }, StringSplitOptions.None);
+
+                                // check if any of the details are in the country list
+                                foreach (string detail in detailsParts)
+                                {
+                                    string trimmedDetail = detail.Trim();
+                                    KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(trimmedDetail);
+                                    if (countryItem != null)
+                                    {
+                                        if (countryItem.HasValue && !machineObject.Country.ContainsKey(countryItem.Value.Key))
+                                        {
+                                            machineObject.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                machineObject.Name = childNode.InnerText;
+                            }
                             break;
 
                         case "year":
@@ -138,7 +174,7 @@ namespace gaseous_signature_parser.classes.parsers
                             rom.SignatureSource = signatureSource;
                             foreach (XmlAttribute romAttribute in childNode.Attributes)
                             {
-                                switch(romAttribute.Name.ToLower())
+                                switch (romAttribute.Name.ToLower())
                                 {
                                     case "name":
                                         rom.Name = childNode.Attributes[romAttribute.Name].Value;
@@ -179,20 +215,26 @@ namespace gaseous_signature_parser.classes.parsers
             return signatureObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml) {
+        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        {
             try
             {
                 XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-                if (xmlHeader != null) {
-                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MAME", StringComparison.OrdinalIgnoreCase)) {
-                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Arcade")) {
+                if (xmlHeader != null)
+                {
+                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MAME", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Arcade"))
+                        {
                             return parser.SignatureParser.MAMEArcade;
                         }
                     }
 
-                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase)) {
-                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Home")) {
+                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Home"))
+                        {
                             return parser.SignatureParser.MAMEMess;
                         }
                     }
