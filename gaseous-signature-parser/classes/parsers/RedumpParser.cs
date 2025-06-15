@@ -349,6 +349,14 @@ namespace gaseous_signature_parser.classes.parsers
                                     case "sha1":
                                         romObject.Sha1 = romAttribute.Value;
                                         break;
+
+                                    case "sha256":
+                                        romObject.Sha256 = romAttribute.Value;
+                                        break;
+
+                                    case "status":
+                                        romObject.Status = romAttribute.Value;
+                                        break;
                                 }
                             }
                             gameObject.Roms.Add(romObject);

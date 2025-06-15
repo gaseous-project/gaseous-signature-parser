@@ -180,12 +180,13 @@ namespace gaseous_signature_parser.classes.parsers
                                 romObject.Crc = xmlGameDetail.Attributes["crc"]?.Value;
                                 romObject.Md5 = xmlGameDetail.Attributes["md5"]?.Value;
                                 romObject.Sha1 = xmlGameDetail.Attributes["sha1"]?.Value;
+                                romObject.Sha256 = xmlGameDetail.Attributes["sha256"]?.Value;
                                 romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.NoIntros;
 
-                                // check the db file if present for this md5 or sha1
+                                // check the db file if present for this md5 or sha1 or sha256
                                 if (noIntroDbXmlDoc != null)
                                 {
-                                    RomSignatureObject.Game dbGame = SearchDB(noIntroDbXmlDoc, romObject.Md5, romObject.Sha1);
+                                    RomSignatureObject.Game dbGame = SearchDB(noIntroDbXmlDoc, romObject.Md5, romObject.Sha1, romObject.Sha256);
                                     if (dbGame != null)
                                     {
                                         if (dbGame.Roms.Count > 0)
@@ -233,16 +234,16 @@ namespace gaseous_signature_parser.classes.parsers
             return noIntrosObject;
         }
 
-        private RomSignatureObject.Game SearchDB(XmlDocument dbXml, string? md5, string? sha1)
+        private RomSignatureObject.Game SearchDB(XmlDocument dbXml, string? md5, string? sha1, string? sha256)
         {
             Dictionary<string, string>? romCountryList = new Dictionary<string, string>();
             Dictionary<string, string>? romLanguageList = new Dictionary<string, string>();
 
-            XmlNodeList xmlGames = dbXml.DocumentElement.SelectNodes($"/datafile/game[source/file[@md5='{md5}' or @sha1='{sha1}']]");
+            XmlNodeList xmlGames = dbXml.DocumentElement.SelectNodes($"/datafile/game[source/file[@md5='{md5}' or @sha1='{sha1}' or @sha256='{sha256}']]");
             RomSignatureObject.Game game = new RomSignatureObject.Game();
             game.Roms = new List<RomSignatureObject.Game.Rom>();
 
-            // search for a game with a file with a matching md5 and/or sha1
+            // search for a game with a file with a matching md5 and/or sha1 and/or sha256
             foreach (XmlNode xmlGame in xmlGames)
             {
                 switch (xmlGame.Name.ToLower())
@@ -427,6 +428,14 @@ namespace gaseous_signature_parser.classes.parsers
                                                             rom.Sha1 = fileAttribute.Value;
                                                             break;
 
+                                                        case "sha256":
+                                                            rom.Sha256 = fileAttribute.Value;
+                                                            break;
+
+                                                        case "status":
+                                                            rom.Status = fileAttribute.Value;
+                                                            break;
+
                                                         default:
                                                             if (!rom.Attributes.ContainsKey(xmlSource.Name + "." + fileAttribute.Name))
                                                             {
@@ -440,7 +449,7 @@ namespace gaseous_signature_parser.classes.parsers
                                         }
                                     }
 
-                                    if (rom.Md5 == md5 || rom.Sha1 == sha1)
+                                    if (rom.Md5 == md5 || rom.Sha1 == sha1 || rom.Sha256 == sha256)
                                     {
                                         game.Roms.Add(rom);
                                         return game;

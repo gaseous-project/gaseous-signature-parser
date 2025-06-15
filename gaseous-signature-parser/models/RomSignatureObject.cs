@@ -71,6 +71,9 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 public string? Crc { get; set; }
                 public string? Md5 { get; set; }
                 public string? Sha1 { get; set; }
+                public string? Sha256 { get; set; }
+
+                public string? Status { get; set; }
 
                 public Dictionary<string, string>? Country { get; set; }
                 public Dictionary<string, string>? Language { get; set; }

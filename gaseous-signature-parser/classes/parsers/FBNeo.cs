@@ -194,6 +194,12 @@ namespace gaseous_signature_parser.classes.parsers
                                     case "sha1":
                                         rom.Sha1 = childNode.Attributes[romAttribute.Name]?.Value;
                                         break;
+                                    case "sha256":
+                                        rom.Sha256 = childNode.Attributes[romAttribute.Name]?.Value;
+                                        break;
+                                    case "status":
+                                        rom.Status = childNode.Attributes[romAttribute.Name]?.Value;
+                                        break;
 
                                     default:
                                         if (!rom.Attributes.ContainsKey(romAttribute.Name))
