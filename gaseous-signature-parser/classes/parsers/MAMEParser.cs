@@ -185,8 +185,17 @@ namespace gaseous_signature_parser.classes.parsers
                                     case "crc":
                                         rom.Crc = childNode.Attributes[romAttribute.Name]?.Value;
                                         break;
+                                    case "md5":
+                                        rom.Md5 = childNode.Attributes[romAttribute.Name]?.Value;
+                                        break;
                                     case "sha1":
                                         rom.Sha1 = childNode.Attributes[romAttribute.Name]?.Value;
+                                        break;
+                                    case "sha256":
+                                        rom.Sha256 = childNode.Attributes[romAttribute.Name]?.Value;
+                                        break;
+                                    case "status":
+                                        rom.Status = childNode.Attributes[romAttribute.Name]?.Value;
                                         break;
 
                                     default:

@@ -350,6 +350,14 @@ namespace gaseous_signature_parser.classes.parsers
                                         romObject.Sha1 = romAttribute.Value;
                                         break;
 
+                                    case "sha256":
+                                        romObject.Sha256 = romAttribute.Value;
+                                        break;
+
+                                    case "status":
+                                        romObject.Status = romAttribute.Value;
+                                        break;
+
                                     default:
                                         if (romAttribute.Value.Length > 0)
                                         {

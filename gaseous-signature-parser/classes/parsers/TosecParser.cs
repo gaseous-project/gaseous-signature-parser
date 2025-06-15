@@ -407,6 +407,8 @@ namespace gaseous_signature_parser.classes.parsers
                                 romObject.Crc = xmlGameDetail.Attributes["crc"]?.Value;
                                 romObject.Md5 = xmlGameDetail.Attributes["md5"]?.Value;
                                 romObject.Sha1 = xmlGameDetail.Attributes["sha1"]?.Value;
+                                romObject.Sha256 = xmlGameDetail.Attributes["sha256"]?.Value;
+                                romObject.Status = xmlGameDetail.Attributes["status"]?.Value;
                                 romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.TOSEC;
 
                                 romObject.Country = romCountryList;
