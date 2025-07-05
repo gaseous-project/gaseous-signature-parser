@@ -28,6 +28,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
         public class Game
         {
             public string? Id { get; set; }
+            public string? CloneOfId { get; set; }
             public string? GameId { get; set; }
             public string? Category { get; set; }
             public string? Name { get; set; }
@@ -238,6 +239,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                                     }
                                     else
                                     {
+                                        // check if typeStringVal.Trim(".,".ToCharArray()) is a number
                                         switch (inType.ToLower())
                                         {
                                             case "disk":
@@ -245,10 +247,16 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                                             case "file":
                                             case "part":
                                             case "tape":
-                                                Number = int.Parse(typeStringVal);
+                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out int numberOne) == true)
+                                                {
+                                                    Number = numberOne;
+                                                }
                                                 break;
                                             case "of":
-                                                Count = int.Parse(typeStringVal);
+                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out int numberTwo) == true)
+                                                {
+                                                    Count = numberTwo;
+                                                }
                                                 break;
                                             case "side":
                                                 Side = typeStringVal;

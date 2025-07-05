@@ -12,6 +12,7 @@ string[] commandLineArgs = Environment.GetCommandLineArgs();
 string scanPath = "./";
 string datPath = "";
 string? dbPath = null;
+string? outpath = null;
 
 string inArgument = "";
 foreach (string commandLineArg in commandLineArgs)
@@ -26,6 +27,7 @@ foreach (string commandLineArg in commandLineArgs)
                 case "-scanpath":
                 case "-datpath":
                 case "-dbpath":
+                case "-outpath":
                     inArgument = commandLineArg.ToLower();
                     break;
                 default:
@@ -44,6 +46,9 @@ foreach (string commandLineArg in commandLineArgs)
                     break;
                 case "-dbpath":
                     dbPath = commandLineArg;
+                    break;
+                case "-outpath":
+                    outpath = commandLineArg;
                     break;
                 default:
                     break;
@@ -118,6 +123,23 @@ if (datPath != null && datPath.Length > 0)
                 }
 
                 romSignatures.Add(datObject);
+
+                if (outpath != null)
+                {
+                    if (Directory.Exists(outpath))
+                    {
+                        // write datObject as JSON to outpath
+                        var jsonSerializerSettings = new JsonSerializerSettings();
+                        jsonSerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                        jsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                        jsonSerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                        jsonSerializerSettings.MaxDepth = 10;
+
+                        string jsonOutput = Newtonsoft.Json.JsonConvert.SerializeObject(datObject, jsonSerializerSettings);
+                        string outFileName = Path.Combine(outpath, Path.GetFileNameWithoutExtension(datPathFile) + ".json");
+                        File.WriteAllText(outFileName, jsonOutput, Encoding.UTF8);
+                    }
+                }
             }
         }
         catch
