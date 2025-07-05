@@ -500,24 +500,26 @@ namespace gaseous_signature_parser.classes.parsers
 
         public parser.SignatureParser GetXmlType(XmlDocument xml)
         {
-            try
-            {
-                XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
+            XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
-                if (xmlHeader != null)
-                {
-                    if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("No-Intro", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return parser.SignatureParser.NoIntro;
-                    }
-                }
-
-                return parser.SignatureParser.Unknown;
-            }
-            catch
+            if (xmlHeader == null)
             {
                 return parser.SignatureParser.Unknown;
             }
+
+            var nodeHomepage = xmlHeader.SelectSingleNode("homepage");
+
+            if (nodeHomepage == null)
+            {
+                return parser.SignatureParser.Unknown;
+            }
+
+            if (nodeHomepage.InnerText.Equals("No-Intro", StringComparison.OrdinalIgnoreCase))
+            {
+                return parser.SignatureParser.NoIntro;
+            }
+
+            return parser.SignatureParser.Unknown;
         }
     }
 }

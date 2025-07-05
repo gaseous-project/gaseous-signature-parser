@@ -226,35 +226,46 @@ namespace gaseous_signature_parser.classes.parsers
 
         public parser.SignatureParser GetXmlType(XmlDocument xml)
         {
-            try
+            XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
+
+            if (xmlHeader == null)
             {
-                XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
+                return parser.SignatureParser.Unknown;
+            }
 
-                if (xmlHeader != null)
+            var nodeName = xmlHeader.SelectSingleNode("name");
+
+            if (nodeName == null)
+            {
+                return parser.SignatureParser.Unknown;
+            }
+
+            var nodeDescription = xmlHeader.SelectSingleNode("description");
+
+            if (nodeDescription == null)
+            {
+                return parser.SignatureParser.Unknown;
+            }
+
+            if (nodeName.InnerText.Equals("MAME", StringComparison.OrdinalIgnoreCase))
+            {
+                if (nodeDescription.InnerText.StartsWith("MAME Arcade"))
                 {
-                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MAME", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Arcade"))
-                        {
-                            return parser.SignatureParser.MAMEArcade;
-                        }
-                    }
-
-                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Home"))
-                        {
-                            return parser.SignatureParser.MAMEMess;
-                        }
-                    }
+                    return parser.SignatureParser.MAMEArcade;
                 }
 
-                return parser.SignatureParser.Unknown;
+                if (nodeDescription.InnerText.StartsWith("MAME Home"))
+                {
+                    return parser.SignatureParser.MAMEMess;
+                }
             }
-            catch
+
+            if (nodeName.InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase) && nodeDescription.InnerText.StartsWith("MAME Home"))
             {
-                return parser.SignatureParser.Unknown;
+                return parser.SignatureParser.MAMEMess;
             }
+
+            return parser.SignatureParser.Unknown;
         }
     }
 }
