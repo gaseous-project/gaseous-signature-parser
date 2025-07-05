@@ -506,9 +506,12 @@ namespace gaseous_signature_parser.classes.parsers
 
                 if (xmlHeader != null)
                 {
-                    if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("No-Intro", StringComparison.OrdinalIgnoreCase))
+                    if (xmlHeader.SelectSingleNode("homepage") != null)
                     {
-                        return parser.SignatureParser.NoIntro;
+                        if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("No-Intro", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return parser.SignatureParser.NoIntro;
+                        }
                     }
                 }
 

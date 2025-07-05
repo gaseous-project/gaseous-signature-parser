@@ -397,9 +397,12 @@ namespace gaseous_signature_parser.classes.parsers
 
                 if (xmlHeader != null)
                 {
-                    if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("redump.org", StringComparison.OrdinalIgnoreCase))
+                    if (xmlHeader.SelectSingleNode("homepage") != null)
                     {
-                        return parser.SignatureParser.Redump;
+                        if (xmlHeader.SelectSingleNode("homepage").InnerText.Equals("redump.org", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return parser.SignatureParser.Redump;
+                        }
                     }
                 }
 

@@ -72,7 +72,14 @@ namespace gaseous_signature_parser.classes.parsers
                     rom.Md5 = childGameNode.Attributes["md5"]?.Value;
                     rom.Sha256 = childGameNode.Attributes["sha256"]?.Value;
                     rom.Status = childGameNode.Attributes["status"]?.Value;
-                    rom.Size = (ulong?)long.Parse(childGameNode.Attributes["size"]?.Value);
+                    if (childGameNode.Attributes["size"] != null)
+                    {
+                        rom.Size = (ulong?)long.Parse(childGameNode.Attributes["size"]?.Value);
+                    }
+                    else
+                    {
+                        rom.Size = null;
+                    }
                     rom.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.WHDLoad;
 
                     // add remaining child nodes to rom.attributes dictionary with the node names as keys

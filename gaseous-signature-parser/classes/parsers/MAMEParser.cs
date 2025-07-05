@@ -240,6 +240,11 @@ namespace gaseous_signature_parser.classes.parsers
                         }
                     }
 
+                    if (xmlHeader.SelectSingleNode("name").InnerText.Equals("mister_from_mame", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return parser.SignatureParser.MAMEArcade;
+                    }
+
                     if (xmlHeader.SelectSingleNode("name").InnerText.Equals("MESS", StringComparison.OrdinalIgnoreCase))
                     {
                         if (xmlHeader.SelectSingleNode("description").InnerText.StartsWith("MAME Home"))
