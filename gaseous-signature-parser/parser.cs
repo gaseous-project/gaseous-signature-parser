@@ -73,6 +73,11 @@ public class parser
 
                 return fbNeoParser.Parse(PathToFile);
 
+            case SignatureParser.PureDOSDAT:
+                classes.parsers.PureDOSDATParser pureDOSDATParser = new classes.parsers.PureDOSDATParser();
+
+                return pureDOSDATParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -149,6 +154,14 @@ public class parser
             return SignatureParser.FBNeo;
         }
 
+        // check if PureDOS DAT
+        classes.parsers.PureDOSDATParser pureDOSDATParser = new classes.parsers.PureDOSDATParser();
+        if (pureDOSDATParser.GetXmlType(XmlDoc) == SignatureParser.PureDOSDAT)
+        {
+            Debug.WriteLine("PureDOS DAT: " + PathToFile);
+            return SignatureParser.PureDOSDAT;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -164,6 +177,7 @@ public class parser
         WHDLoad = 6,
         RetroAchievements = 7,
         FBNeo = 8,
+        PureDOSDAT = 9,
         Unknown = 100
     }
 
