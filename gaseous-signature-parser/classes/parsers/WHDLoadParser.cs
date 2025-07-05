@@ -74,7 +74,14 @@ namespace gaseous_signature_parser.classes.parsers
                     rom.Status = childGameNode.Attributes["status"]?.Value;
                     if (childGameNode.Attributes["size"] != null)
                     {
-                        rom.Size = (ulong?)long.Parse(childGameNode.Attributes["size"]?.Value);
+                        if (ulong.TryParse(childGameNode.Attributes["size"]?.Value, out ulong size))
+                        {
+                            rom.Size = size;
+                        }
+                        else
+                        {
+                            rom.Size = null;
+                        }
                     }
                     else
                     {
