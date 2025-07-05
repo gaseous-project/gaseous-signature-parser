@@ -398,6 +398,11 @@ namespace gaseous_signature_parser.classes.parsers
 
         public parser.SignatureParser GetXmlType(XmlDocument xml)
         {
+            if (xml.DocumentElement == null)
+            {
+                return parser.SignatureParser.Unknown;
+            }
+
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
             if (xmlHeader == null)
