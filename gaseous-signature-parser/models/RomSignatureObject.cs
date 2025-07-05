@@ -145,7 +145,12 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// <summary>
                     /// https://github.com/libretro/FBNeo/tree/master/dats
                     /// </summary>
-                    FBNeo = 8
+                    FBNeo = 8,
+
+                    /// <summary>
+                    /// https://github.com/PureDOS/DAT
+                    /// </summary>
+                    PureDOSDAT = 9,
                 }
 
                 public enum RomTypes

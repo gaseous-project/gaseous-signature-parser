@@ -75,7 +75,9 @@ if (datPath != null && datPath.Length > 0)
         Console.WriteLine("DB XML search path: " + dbPath);
     }
 
-    string[] datPathContents = Directory.GetFiles(datPath, "*.dat");
+    string[] datPathContents_dat = Directory.GetFiles(datPath, "*.dat");
+    string[] datPathContents_xml = Directory.GetFiles(datPath, "*.xml");
+    string[] datPathContents = datPathContents_dat.Concat(datPathContents_xml).ToArray();
     string[] dbPathContents = new string[0];
     if (dbPath != null)
     {
