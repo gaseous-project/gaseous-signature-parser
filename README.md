@@ -9,6 +9,7 @@ This package provides parsing of TOSEC and other DAT files for the Gaseous Serve
 * Redump: http://redump.org/downloads/
 * Amiga `whdload_db.xml` (see notes): https://github.com/BlitterStudio/amiberry/blob/master/whdboot/game-data/whdload_db.xml
 * FBNeo: https://github.com/libretro/FBNeo/tree/master/dats
+* DOS DAT: https://github.com/PureDOS/DAT
 
 ## How to use
 

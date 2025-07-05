@@ -127,6 +127,15 @@ namespace gaseous_signature_parser.classes.parsers
                     }
                 }
 
+                XmlAttribute cloneIdAttribute = xmlGame.Attributes["cloneofid"];
+                if (cloneIdAttribute != null)
+                {
+                    if (long.TryParse(cloneIdAttribute.Value, out var cloneId) == true)
+                    {
+                        gameObject.CloneOfId = cloneId.ToString();
+                    }
+                }
+
                 gameObject.System = SystemName;
 
                 // parse game name
@@ -158,30 +167,54 @@ namespace gaseous_signature_parser.classes.parsers
 
                         case "rom":
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
+                            romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.NoIntros;
+
+                            // set defaults
                             romObject.Attributes = new Dictionary<string, object>();
+                            romObject.Size = 0;
                             if (xmlGameDetail != null)
                             {
-                                romObject.Name = xmlGameDetail.Attributes["name"]?.Value;
-                                if (xmlGameDetail.Attributes["size"]?.Value != null)
+                                foreach (XmlAttribute attribute in xmlGameDetail.Attributes)
                                 {
-                                    if (UInt64.TryParse(xmlGameDetail.Attributes["size"]?.Value, out _) == true)
+                                    switch (attribute.Name.ToLower())
                                     {
-                                        romObject.Size = UInt64.Parse(xmlGameDetail.Attributes["size"]?.Value);
-                                    }
-                                    else
-                                    {
-                                        romObject.Size = 0;
+                                        case "name":
+                                            romObject.Name = attribute.Value;
+                                            break;
+
+                                        case "size":
+                                            if (UInt64.TryParse(attribute.Value, out _) == true)
+                                            {
+                                                romObject.Size = UInt64.Parse(attribute.Value);
+                                            }
+                                            else
+                                            {
+                                                romObject.Size = 0;
+                                            }
+                                            break;
+
+                                        case "crc":
+                                            romObject.Crc = attribute.Value;
+                                            break;
+
+                                        case "md5":
+                                            romObject.Md5 = attribute.Value;
+                                            break;
+
+                                        case "sha1":
+                                            romObject.Sha1 = attribute.Value;
+                                            break;
+
+                                        case "sha256":
+                                            romObject.Sha256 = attribute.Value;
+                                            break;
+
+                                        case "status":
+                                            romObject.Status = attribute.Value;
+                                            break;
                                     }
                                 }
-                                else
-                                {
-                                    romObject.Size = 0;
-                                }
-                                romObject.Crc = xmlGameDetail.Attributes["crc"]?.Value;
-                                romObject.Md5 = xmlGameDetail.Attributes["md5"]?.Value;
-                                romObject.Sha1 = xmlGameDetail.Attributes["sha1"]?.Value;
-                                romObject.Sha256 = xmlGameDetail.Attributes["sha256"]?.Value;
-                                romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.NoIntros;
+
 
                                 // check the db file if present for this md5 or sha1 or sha256
                                 if (noIntroDbXmlDoc != null)
