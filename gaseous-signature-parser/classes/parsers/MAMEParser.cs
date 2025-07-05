@@ -254,9 +254,9 @@ namespace gaseous_signature_parser.classes.parsers
                     return parser.SignatureParser.MAMEArcade;
                 }
 
-                if (nodeDescription.InnerText.StartsWith("MAME Arcade"))
+                if (nodeDescription.InnerText.StartsWith("MAME Home"))
                 {
-                    return parser.SignatureParser.MAMEArcade;
+                    return parser.SignatureParser.MAMEMess;
                 }
             }
 
