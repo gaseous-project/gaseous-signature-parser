@@ -130,9 +130,9 @@ namespace gaseous_signature_parser.classes.parsers
                 XmlAttribute cloneIdAttribute = xmlGame.Attributes["cloneofid"];
                 if (cloneIdAttribute != null)
                 {
-                    if (long.TryParse(cloneIdAttribute.Value, out _) == true)
+                    if (long.TryParse(cloneIdAttribute.Value, out var cloneId) == true)
                     {
-                        gameObject.CloneOfId = long.Parse(cloneIdAttribute.Value).ToString();
+                        gameObject.CloneOfId = cloneId.ToString();
                     }
                 }
 

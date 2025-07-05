@@ -247,13 +247,13 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                                             case "file":
                                             case "part":
                                             case "tape":
-                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out int numberOne) == true)
+                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out var numberOne))
                                                 {
                                                     Number = numberOne;
                                                 }
                                                 break;
                                             case "of":
-                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out int numberTwo) == true)
+                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out var numberTwo))
                                                 {
                                                     Count = numberTwo;
                                                 }
