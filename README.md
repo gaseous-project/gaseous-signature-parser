@@ -11,6 +11,7 @@ This package provides parsing of TOSEC and other DAT files for the Gaseous Serve
 * FBNeo: https://github.com/libretro/FBNeo/tree/master/dats
 * DOS DAT: https://github.com/PureDOS/DAT
 * N64 Hacks: https://github.com/darkblood159/Nintendo-64-RomHack-Dat
+* Pleasuredome: https://github.com/pleasuredome/pleasuredome/tree/gh-pages
 
 ## How to use
 
