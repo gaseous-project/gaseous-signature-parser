@@ -153,6 +153,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     PureDOSDAT = 9,
 
                     /// <summary>
+                    /// https://github.com/pleasuredome/pleasuredome/tree/gh-pages
+                    /// </summary>
+                    Pleasuredome = 10,
+
+                    /// <summary>
                     /// Generic parser, used for custom parsers
                     /// </summary>
                     Generic = 99
