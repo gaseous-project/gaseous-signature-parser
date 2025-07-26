@@ -151,6 +151,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// https://github.com/PureDOS/DAT
                     /// </summary>
                     PureDOSDAT = 9,
+
+                    /// <summary>
+                    /// Generic parser, used for custom parsers
+                    /// </summary>
+                    Generic = 99
                 }
 
                 public enum RomTypes
