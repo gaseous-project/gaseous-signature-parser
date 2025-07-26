@@ -167,7 +167,14 @@ namespace gaseous_signature_parser.classes.parsers
                                         rom.Name = childNode.Attributes[romAttribute.Name].Value;
                                         break;
                                     case "size":
-                                        rom.Size = UInt64.Parse(childNode.Attributes[romAttribute.Name]?.Value);
+                                        if (UInt64.TryParse(childNode.Attributes[romAttribute.Name]?.Value, out ulong sizeValue))
+                                        {
+                                            rom.Size = sizeValue;
+                                        }
+                                        else
+                                        {
+                                            rom.Size = 0;
+                                        }
                                         break;
                                     case "crc":
                                         rom.Crc = childNode.Attributes[romAttribute.Name]?.Value;
