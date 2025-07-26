@@ -18,7 +18,7 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Development/Signatures/DOS DAT",
+                "${env:HOME}/Development/Signatures/Nintendo-64-RomHack-Dat",
                 "-outpath",
                 "${env:HOME}/Development/Signatures/Output",
             ]

@@ -10,6 +10,7 @@ This package provides parsing of TOSEC and other DAT files for the Gaseous Serve
 * Amiga `whdload_db.xml` (see notes): https://github.com/BlitterStudio/amiberry/blob/master/whdboot/game-data/whdload_db.xml
 * FBNeo: https://github.com/libretro/FBNeo/tree/master/dats
 * DOS DAT: https://github.com/PureDOS/DAT
+* N64 Hacks: https://github.com/darkblood159/Nintendo-64-RomHack-Dat
 
 ## How to use
 

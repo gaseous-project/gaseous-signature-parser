@@ -78,6 +78,11 @@ public class parser
 
                 return pureDOSDATParser.Parse(PathToFile);
 
+            case SignatureParser.Generic:
+                classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
+
+                return genericParser.Parse(PathToFile);
+
             case SignatureParser.Unknown:
             default:
                 throw new Exception("Unknown parser type");
@@ -162,6 +167,14 @@ public class parser
             return SignatureParser.PureDOSDAT;
         }
 
+        // check if Generic
+        classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
+        if (genericParser.GetXmlType(XmlDoc) == SignatureParser.Generic)
+        {
+            Debug.WriteLine("Generic: " + PathToFile);
+            return SignatureParser.Generic;
+        }
+
         // unable to determine type
         return SignatureParser.Unknown;
     }
@@ -178,6 +191,7 @@ public class parser
         RetroAchievements = 7,
         FBNeo = 8,
         PureDOSDAT = 9,
+        Generic = 99,
         Unknown = 100
     }
 
