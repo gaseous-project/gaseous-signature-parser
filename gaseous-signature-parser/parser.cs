@@ -78,6 +78,11 @@ public class parser
 
                 return pureDOSDATParser.Parse(PathToFile);
 
+            case SignatureParser.Pleasuredome:
+                classes.parsers.PleasuredomeParser pleasuredomeParser = new classes.parsers.PleasuredomeParser();
+
+                return pleasuredomeParser.Parse(PathToFile);
+
             case SignatureParser.Generic:
                 classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
 
@@ -167,6 +172,14 @@ public class parser
             return SignatureParser.PureDOSDAT;
         }
 
+        // check if Pleasuredome
+        classes.parsers.PleasuredomeParser pleasuredomeParser = new classes.parsers.PleasuredomeParser();
+        if (pleasuredomeParser.GetXmlType(XmlDoc) == SignatureParser.Pleasuredome)
+        {
+            Debug.WriteLine("Pleasuredome: " + PathToFile);
+            return SignatureParser.Pleasuredome;
+        }
+
         // check if Generic
         classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
         if (genericParser.GetXmlType(XmlDoc) == SignatureParser.Generic)
@@ -191,6 +204,7 @@ public class parser
         RetroAchievements = 7,
         FBNeo = 8,
         PureDOSDAT = 9,
+        Pleasuredome = 10,
         Generic = 99,
         Unknown = 100
     }
