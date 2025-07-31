@@ -205,87 +205,94 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 {
                     public MediaType(SignatureSourceType Source, string MediaTypeString)
                     {
-                        switch (Source)
+                        try
                         {
-                            case Rom.SignatureSourceType.TOSEC:
-                            case Rom.SignatureSourceType.NoIntros:
-                            case Rom.SignatureSourceType.Redump:
-                                string[] typeString = MediaTypeString.Split(" ");
+                            switch (Source)
+                            {
+                                case Rom.SignatureSourceType.TOSEC:
+                                case Rom.SignatureSourceType.NoIntros:
+                                case Rom.SignatureSourceType.Redump:
+                                    string[] typeString = MediaTypeString.Split(" ");
 
-                                string inType = "";
-                                foreach (string typeStringVal in typeString)
-                                {
-                                    if (inType == "")
+                                    string inType = "";
+                                    foreach (string typeStringVal in typeString)
                                     {
-                                        switch (typeStringVal.ToLower())
+                                        if (inType == "")
                                         {
-                                            case "disk":
-                                                Media = Rom.RomTypes.Disk;
+                                            switch (typeStringVal.ToLower())
+                                            {
+                                                case "disk":
+                                                    Media = Rom.RomTypes.Disk;
 
-                                                inType = typeStringVal;
-                                                break;
-                                            case "disc":
-                                                Media = Rom.RomTypes.Disc;
+                                                    inType = typeStringVal;
+                                                    break;
+                                                case "disc":
+                                                    Media = Rom.RomTypes.Disc;
 
-                                                inType = typeStringVal;
-                                                break;
-                                            case "file":
-                                                Media = Rom.RomTypes.File;
+                                                    inType = typeStringVal;
+                                                    break;
+                                                case "file":
+                                                    Media = Rom.RomTypes.File;
 
-                                                inType = typeStringVal;
-                                                break;
-                                            case "part":
-                                                Media = Rom.RomTypes.Part;
+                                                    inType = typeStringVal;
+                                                    break;
+                                                case "part":
+                                                    Media = Rom.RomTypes.Part;
 
-                                                inType = typeStringVal;
-                                                break;
-                                            case "tape":
-                                                Media = Rom.RomTypes.Tape;
+                                                    inType = typeStringVal;
+                                                    break;
+                                                case "tape":
+                                                    Media = Rom.RomTypes.Tape;
 
-                                                inType = typeStringVal;
-                                                break;
-                                            case "of":
-                                                inType = typeStringVal;
-                                                break;
-                                            case "side":
-                                                inType = typeStringVal;
-                                                break;
+                                                    inType = typeStringVal;
+                                                    break;
+                                                case "of":
+                                                    inType = typeStringVal;
+                                                    break;
+                                                case "side":
+                                                    inType = typeStringVal;
+                                                    break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // check if typeStringVal.Trim(".,".ToCharArray()) is a number
+                                            switch (inType.ToLower())
+                                            {
+                                                case "disk":
+                                                case "disc":
+                                                case "file":
+                                                case "part":
+                                                case "tape":
+                                                    if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out var numberOne))
+                                                    {
+                                                        Number = numberOne;
+                                                    }
+                                                    break;
+                                                case "of":
+                                                    if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out var numberTwo))
+                                                    {
+                                                        Count = numberTwo;
+                                                    }
+                                                    break;
+                                                case "side":
+                                                    Side = typeStringVal;
+                                                    break;
+                                            }
+                                            inType = "";
                                         }
                                     }
-                                    else
-                                    {
-                                        // check if typeStringVal.Trim(".,".ToCharArray()) is a number
-                                        switch (inType.ToLower())
-                                        {
-                                            case "disk":
-                                            case "disc":
-                                            case "file":
-                                            case "part":
-                                            case "tape":
-                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out var numberOne))
-                                                {
-                                                    Number = numberOne;
-                                                }
-                                                break;
-                                            case "of":
-                                                if (int.TryParse(typeStringVal.Trim(".,".ToCharArray()), out var numberTwo))
-                                                {
-                                                    Count = numberTwo;
-                                                }
-                                                break;
-                                            case "side":
-                                                Side = typeStringVal;
-                                                break;
-                                        }
-                                        inType = "";
-                                    }
-                                }
 
-                                break;
+                                    break;
 
-                            default:
-                                break;
+                                default:
+                                    break;
 
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error parsing MediaType: {ex.Message}");
                         }
                     }
 
