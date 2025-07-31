@@ -292,7 +292,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error parsing MediaType: {ex.Message}");
+                            Console.WriteLine($"Error parsing MediaType from source {Source} with input '{MediaTypeString}': {ex.Message}");
                         }
                     }
 
