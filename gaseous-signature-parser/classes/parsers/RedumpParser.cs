@@ -262,12 +262,17 @@ namespace gaseous_signature_parser.classes.parsers
                 }
 
                 // get the game data
+                string gameSerial = "";
                 foreach (XmlNode gameNode in xmlGame.ChildNodes)
                 {
                     switch (gameNode.Name.ToLower())
                     {
                         case "category":
                             gameObject.Category = gameNode.InnerText;
+                            break;
+
+                        case "serial":
+                            gameSerial = gameNode.InnerText;
                             break;
 
                         case "rom":
@@ -357,9 +362,26 @@ namespace gaseous_signature_parser.classes.parsers
                                     case "status":
                                         romObject.Status = romAttribute.Value;
                                         break;
+
+                                    default:
+                                        // capture any other attributes as extra metadata
+                                        romObject.Attributes.Add(romAttribute.Name, romAttribute.Value);
+                                        break;
                                 }
                             }
+
+                            // apply serial to the rom object if it's not null
+                            if (string.IsNullOrEmpty(gameSerial) == false)
+                            {
+                                romObject.Attributes.Add("serial", gameSerial);
+                            }
+
                             gameObject.Roms.Add(romObject);
+                            break;
+
+                        default:
+                            // capture any other tags as extra metadata
+                            gameObject.flags.Add(gameNode.Name, gameNode.InnerText);
                             break;
                     }
                 }
