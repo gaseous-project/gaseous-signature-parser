@@ -158,6 +158,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     Pleasuredome = 10,
 
                     /// <summary>
+                    /// https://github.com/MetalSlug/MAMERedump
+                    /// </summary>
+                    MAMERedump = 11,
+
+                    /// <summary>
                     /// Generic parser, used for custom parsers
                     /// </summary>
                     Generic = 99
@@ -212,6 +217,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                                 case Rom.SignatureSourceType.TOSEC:
                                 case Rom.SignatureSourceType.NoIntros:
                                 case Rom.SignatureSourceType.Redump:
+                                case Rom.SignatureSourceType.MAMERedump:
                                     string[] typeString = MediaTypeString.Split(" ");
 
                                     string inType = "";

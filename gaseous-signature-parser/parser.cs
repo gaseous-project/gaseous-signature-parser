@@ -83,6 +83,11 @@ public class parser
 
                 return pleasuredomeParser.Parse(PathToFile);
 
+            case SignatureParser.MAMERedump:
+                classes.parsers.MAMERedumpParser mAMERedumpParser = new classes.parsers.MAMERedumpParser();
+
+                return mAMERedumpParser.Parse(PathToFile);
+
             case SignatureParser.Generic:
                 classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
 
@@ -180,6 +185,14 @@ public class parser
             return SignatureParser.Pleasuredome;
         }
 
+        // check if MAMERedump
+        classes.parsers.MAMERedumpParser mAMERedumpParser = new classes.parsers.MAMERedumpParser();
+        if (mAMERedumpParser.GetXmlType(XmlDoc) == SignatureParser.MAMERedump)
+        {
+            Debug.WriteLine("MAMERedump: " + PathToFile);
+            return SignatureParser.MAMERedump;
+        }
+
         // check if Generic
         classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
         if (genericParser.GetXmlType(XmlDoc) == SignatureParser.Generic)
@@ -205,6 +218,7 @@ public class parser
         FBNeo = 8,
         PureDOSDAT = 9,
         Pleasuredome = 10,
+        MAMERedump = 11,
         Generic = 99,
         Unknown = 100
     }
