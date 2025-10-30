@@ -83,6 +83,11 @@ public class parser
 
                 return pleasuredomeParser.Parse(PathToFile);
 
+            case SignatureParser.MAMERedump:
+                classes.parsers.MAMERedumpParser mAMERedumpParser = new classes.parsers.MAMERedumpParser();
+
+                return mAMERedumpParser.Parse(PathToFile);
+
             case SignatureParser.Generic:
                 classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
 

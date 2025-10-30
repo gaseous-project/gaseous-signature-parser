@@ -12,6 +12,7 @@ This package provides parsing of TOSEC and other DAT files for the Gaseous Serve
 * DOS DAT: https://github.com/PureDOS/DAT
 * N64 Hacks: https://github.com/darkblood159/Nintendo-64-RomHack-Dat
 * Pleasuredome: https://github.com/pleasuredome/pleasuredome/tree/gh-pages
+* MAME Redump: https://github.com/MetalSlug/MAMERedump
 
 ## How to use
 
