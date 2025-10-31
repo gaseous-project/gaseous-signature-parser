@@ -186,6 +186,7 @@ namespace gaseous_signature_parser.classes.parsers
 
                             case "rom":
                                 RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
+                                romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.PureDOSDAT;
                                 romObject.Attributes = new Dictionary<string, object>();
                                 if (xmlGameDetail != null)
                                 {
