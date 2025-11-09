@@ -108,31 +108,34 @@ namespace gaseous_signature_parser.classes.parsers
             {
                 RomSignatureObject.Game gameObject = new RomSignatureObject.Game();
                 XmlAttribute idAttribute = xmlGame.Attributes["id"];
-                if (idAttribute == null)
-                {
-                    continue;
-                }
+                // if (idAttribute == null)
+                // {
+                //     continue;
+                // }
 
-                if (long.TryParse(idAttribute.Value, out _) == true)
+                if (idAttribute != null)
                 {
-                    gameObject.Id = long.Parse(idAttribute.Value).ToString();
-                }
-                else
-                {
-                    // string is not a valid int - convert each char to it's ascii code and make a new int from that
-                    gameObject.Id = 0.ToString();
-                    foreach (char c in xmlGame.Attributes["id"].Value)
+                    if (long.TryParse(idAttribute.Value, out _) == true)
                     {
-                        gameObject.Id = (Convert.ToInt64(c) + Convert.ToInt64(gameObject.Id)).ToString();
+                        gameObject.Id = long.Parse(idAttribute.Value).ToString();
                     }
-                }
-
-                XmlAttribute cloneIdAttribute = xmlGame.Attributes["cloneofid"];
-                if (cloneIdAttribute != null)
-                {
-                    if (long.TryParse(cloneIdAttribute.Value, out var cloneId) == true)
+                    else
                     {
-                        gameObject.CloneOfId = cloneId.ToString();
+                        // string is not a valid int - convert each char to it's ascii code and make a new int from that
+                        gameObject.Id = 0.ToString();
+                        foreach (char c in xmlGame.Attributes["id"].Value)
+                        {
+                            gameObject.Id = (Convert.ToInt64(c) + Convert.ToInt64(gameObject.Id)).ToString();
+                        }
+                    }
+
+                    XmlAttribute cloneIdAttribute = xmlGame.Attributes["cloneofid"];
+                    if (cloneIdAttribute != null)
+                    {
+                        if (long.TryParse(cloneIdAttribute.Value, out var cloneId) == true)
+                        {
+                            gameObject.CloneOfId = cloneId.ToString();
+                        }
                     }
                 }
 
@@ -505,6 +508,18 @@ namespace gaseous_signature_parser.classes.parsers
             if (xmlHeader == null)
             {
                 return parser.SignatureParser.Unknown;
+            }
+
+            var nodeName = xmlHeader.SelectSingleNode("name");
+            var nodeUrl = xmlHeader.SelectSingleNode("url");
+            if (nodeName != null && nodeUrl != null)
+            {
+                // check if No-Intro parent-clone
+                if (nodeName.InnerText.EndsWith(" (Parent-Clone)", StringComparison.OrdinalIgnoreCase) &&
+                    nodeUrl.InnerText.Equals("https://www.no-intro.org", StringComparison.OrdinalIgnoreCase))
+                {
+                    return parser.SignatureParser.NoIntro;
+                }
             }
 
             var nodeHomepage = xmlHeader.SelectSingleNode("homepage");
