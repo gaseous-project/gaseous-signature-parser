@@ -18,7 +18,7 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Development/Signatures/NoIntro/DAT",
+                "${env:HOME}/Development/Signatures/Redump",
                 "-dbpath",
                 "${env:HOME}/Development/Signatures/NoIntro/DB",
                 "-outpath",
