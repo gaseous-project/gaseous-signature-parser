@@ -376,6 +376,17 @@ namespace gaseous_signature_parser.classes.parsers
                                 romObject.Attributes.Add("serial", gameSerial);
                             }
 
+                            // apply country list to the rom object
+                            if (romCountryList != null && romCountryList.Count > 0)
+                            {
+                                romObject.Country = new Dictionary<string, string>(romCountryList);
+                            }
+                            // apply language list to the rom object
+                            if (romLanguageList != null && romLanguageList.Count > 0)
+                            {
+                                romObject.Language = new Dictionary<string, string>(romLanguageList);
+                            }
+
                             gameObject.Roms.Add(romObject);
                             break;
 
