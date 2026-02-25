@@ -8,14 +8,14 @@ using gaseous_signature_parser.models;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class TosecParser
+    public class TosecParser : IParser
     {
         public TosecParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // load resources
             var assembly = Assembly.GetExecutingAssembly();

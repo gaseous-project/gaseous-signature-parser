@@ -35,69 +35,30 @@ public class parser
             DetectedSignatureType = Parser;
         }
 
-        switch (DetectedSignatureType)
+        // Use factory to create the appropriate parser
+        classes.parsers.IParser parser = classes.parsers.ParserFactory.CreateParser(DetectedSignatureType);
+
+        // Prepare options dictionary for parsers that need extra parameters
+        Dictionary<string, object>? options = null;
+
+        // MAME parsers need to know which type they are
+        if (DetectedSignatureType == SignatureParser.MAMEArcade || DetectedSignatureType == SignatureParser.MAMEMess)
         {
-            case SignatureParser.TOSEC:
-                classes.parsers.TosecParser tosecParser = new classes.parsers.TosecParser();
-
-                return tosecParser.Parse(PathToFile);
-
-            case SignatureParser.MAMEArcade:
-            case SignatureParser.MAMEMess:
-                classes.parsers.MAMEParser mAMEParser = new classes.parsers.MAMEParser();
-
-                return mAMEParser.Parse(PathToFile, DetectedSignatureType);
-
-            case SignatureParser.NoIntro:
-                classes.parsers.NoIntrosParser noIntrosParser = new classes.parsers.NoIntrosParser();
-
-                return noIntrosParser.Parse(PathToFile, PathToDBFile);
-
-            case SignatureParser.Redump:
-                classes.parsers.RedumpParser redumpParser = new classes.parsers.RedumpParser();
-
-                return redumpParser.Parse(PathToFile);
-
-            case SignatureParser.WHDLoad:
-                classes.parsers.WHDLoadParser whdloadParser = new classes.parsers.WHDLoadParser();
-
-                return whdloadParser.Parse(PathToFile);
-
-            case SignatureParser.RetroAchievements:
-                classes.parsers.RetroAchievementsParser retroAchievementsParser = new classes.parsers.RetroAchievementsParser();
-
-                return retroAchievementsParser.Parse(PathToFile);
-
-            case SignatureParser.FBNeo:
-                classes.parsers.FBNeoParser fbNeoParser = new classes.parsers.FBNeoParser();
-
-                return fbNeoParser.Parse(PathToFile);
-
-            case SignatureParser.PureDOSDAT:
-                classes.parsers.PureDOSDATParser pureDOSDATParser = new classes.parsers.PureDOSDATParser();
-
-                return pureDOSDATParser.Parse(PathToFile);
-
-            case SignatureParser.Pleasuredome:
-                classes.parsers.PleasuredomeParser pleasuredomeParser = new classes.parsers.PleasuredomeParser();
-
-                return pleasuredomeParser.Parse(PathToFile);
-
-            case SignatureParser.MAMERedump:
-                classes.parsers.MAMERedumpParser mAMERedumpParser = new classes.parsers.MAMERedumpParser();
-
-                return mAMERedumpParser.Parse(PathToFile);
-
-            case SignatureParser.Generic:
-                classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
-
-                return genericParser.Parse(PathToFile);
-
-            case SignatureParser.Unknown:
-            default:
-                throw new Exception("Unknown parser type");
-
+            options = new Dictionary<string, object>
+            {
+                { "DocumentType", DetectedSignatureType }
+            };
         }
+        // NoIntro parser needs the optional database file
+        else if (DetectedSignatureType == SignatureParser.NoIntro && PathToDBFile != null)
+        {
+            options = new Dictionary<string, object>
+            {
+                { "PathToDBFile", PathToDBFile }
+            };
+        }
+
+        return parser.Parse(PathToFile, options);
     }
 
     private SignatureParser GetSignatureType(string PathToFile)
@@ -112,93 +73,40 @@ public class parser
             throw new Exception("Not an XML file", ex);
         }
 
-        // check if TOSEC
-        classes.parsers.TosecParser tosecParser = new classes.parsers.TosecParser();
-        if (tosecParser.GetXmlType(XmlDoc) == SignatureParser.TOSEC)
+        // List of parser types to try (ordered by most common to least common for performance)
+        var parserTypesToCheck = new[]
         {
-            Debug.WriteLine("TOSEC: " + PathToFile);
-            return SignatureParser.TOSEC;
-        }
+            SignatureParser.TOSEC,
+            SignatureParser.MAMEArcade, // MAMEParser handles both Arcade and Mess
+            SignatureParser.NoIntro,
+            SignatureParser.Redump,
+            SignatureParser.WHDLoad,
+            SignatureParser.RetroAchievements,
+            SignatureParser.FBNeo,
+            SignatureParser.PureDOSDAT,
+            SignatureParser.Pleasuredome,
+            SignatureParser.MAMERedump,
+            SignatureParser.Generic
+        };
 
-        // check if MAMEArcade
-        classes.parsers.MAMEParser mAMEArcadeParser = new classes.parsers.MAMEParser();
-        SignatureParser mameSigType = mAMEArcadeParser.GetXmlType(XmlDoc);
-        if (mameSigType != SignatureParser.Unknown)
+        foreach (var parserType in parserTypesToCheck)
         {
-            Debug.WriteLine(mameSigType.ToString() + ": " + PathToFile);
-            return mameSigType;
-        }
+            try
+            {
+                classes.parsers.IParser parser = classes.parsers.ParserFactory.CreateParser(parserType);
+                SignatureParser detectedType = parser.GetXmlType(XmlDoc);
 
-        // check if NoIntro
-        classes.parsers.NoIntrosParser noIntroParser = new classes.parsers.NoIntrosParser();
-        if (noIntroParser.GetXmlType(XmlDoc) == SignatureParser.NoIntro)
-        {
-            Debug.WriteLine("No-Intro: " + PathToFile);
-            return SignatureParser.NoIntro;
-        }
-
-        // check if Redump
-        classes.parsers.RedumpParser redumpParser = new classes.parsers.RedumpParser();
-        if (redumpParser.GetXmlType(XmlDoc) == SignatureParser.Redump)
-        {
-            Debug.WriteLine("Redump: " + PathToFile);
-            return SignatureParser.Redump;
-        }
-
-        // check if WHDLoad
-        classes.parsers.WHDLoadParser whdloadParser = new classes.parsers.WHDLoadParser();
-        if (whdloadParser.GetXmlType(XmlDoc) == SignatureParser.WHDLoad)
-        {
-            Debug.WriteLine("WHDLoad: " + PathToFile);
-            return SignatureParser.WHDLoad;
-        }
-
-        // check if RetroAchievements
-        classes.parsers.RetroAchievementsParser retroAchievementsParser = new classes.parsers.RetroAchievementsParser();
-        if (retroAchievementsParser.GetXmlType(XmlDoc) == SignatureParser.RetroAchievements)
-        {
-            Debug.WriteLine("RetroAchievements: " + PathToFile);
-            return SignatureParser.RetroAchievements;
-        }
-
-        // check if FBNeo
-        classes.parsers.FBNeoParser fbNeoParser = new classes.parsers.FBNeoParser();
-        if (fbNeoParser.GetXmlType(XmlDoc) == SignatureParser.FBNeo)
-        {
-            Debug.WriteLine("FBNeo: " + PathToFile);
-            return SignatureParser.FBNeo;
-        }
-
-        // check if PureDOS DAT
-        classes.parsers.PureDOSDATParser pureDOSDATParser = new classes.parsers.PureDOSDATParser();
-        if (pureDOSDATParser.GetXmlType(XmlDoc) == SignatureParser.PureDOSDAT)
-        {
-            Debug.WriteLine("PureDOS DAT: " + PathToFile);
-            return SignatureParser.PureDOSDAT;
-        }
-
-        // check if Pleasuredome
-        classes.parsers.PleasuredomeParser pleasuredomeParser = new classes.parsers.PleasuredomeParser();
-        if (pleasuredomeParser.GetXmlType(XmlDoc) == SignatureParser.Pleasuredome)
-        {
-            Debug.WriteLine("Pleasuredome: " + PathToFile);
-            return SignatureParser.Pleasuredome;
-        }
-
-        // check if MAMERedump
-        classes.parsers.MAMERedumpParser mAMERedumpParser = new classes.parsers.MAMERedumpParser();
-        if (mAMERedumpParser.GetXmlType(XmlDoc) == SignatureParser.MAMERedump)
-        {
-            Debug.WriteLine("MAMERedump: " + PathToFile);
-            return SignatureParser.MAMERedump;
-        }
-
-        // check if Generic
-        classes.parsers.GenericParser genericParser = new classes.parsers.GenericParser();
-        if (genericParser.GetXmlType(XmlDoc) == SignatureParser.Generic)
-        {
-            Debug.WriteLine("Generic: " + PathToFile);
-            return SignatureParser.Generic;
+                if (detectedType != SignatureParser.Unknown)
+                {
+                    Debug.WriteLine($"{detectedType}: {PathToFile}");
+                    return detectedType;
+                }
+            }
+            catch
+            {
+                // If parser creation fails, continue to next type
+                continue;
+            }
         }
 
         // unable to determine type

@@ -18,11 +18,11 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Development/Signatures/MAMERedump/MAME Redump",
+                "C:\\Users\\michael.green\\Downloads\\NoIntro\\DAT",
                 "-dbpath",
-                "${env:HOME}/Development/Signatures/NoIntro/DB",
+                "C:\\Users\\michael.green\\Downloads\\NoIntro\\DB",
                 "-outpath",
-                "${env:HOME}/Development/Signatures/Output",
+                "C:\\Users\\michael.green\\Downloads\\NoIntro\\Output",
             ]
         }
     ]

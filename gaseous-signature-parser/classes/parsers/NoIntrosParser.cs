@@ -8,14 +8,26 @@ using gaseous_signature_parser.models;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class NoIntrosParser
+    public class NoIntrosParser : IParser
     {
         public NoIntrosParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, string? dbXMLFile)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        {
+            // Extract dbXMLFile from options
+            string? dbXMLFile = null;
+            if (options != null && options.ContainsKey("PathToDBFile"))
+            {
+                dbXMLFile = options["PathToDBFile"] as string;
+            }
+
+            return ParseInternal(XMLFile, dbXMLFile);
+        }
+
+        private RomSignatureObject ParseInternal(string XMLFile, string? dbXMLFile)
         {
             // get hashes of NoIntros file
             var xmlStream = File.OpenRead(XMLFile);

@@ -9,14 +9,14 @@ using System.Diagnostics;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class PleasuredomeParser
+    public class PleasuredomeParser : IParser
     {
         public PleasuredomeParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of provided file
             var xmlStream = File.OpenRead(XMLFile);

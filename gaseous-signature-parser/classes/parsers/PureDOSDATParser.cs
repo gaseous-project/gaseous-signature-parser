@@ -7,14 +7,14 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class PureDOSDATParser
+    public class PureDOSDATParser : IParser
     {
         public PureDOSDATParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of PureDOSDAT file
             string md5Hash = string.Empty;

@@ -9,14 +9,14 @@ using System.Diagnostics;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class FBNeoParser
+    public class FBNeoParser : IParser
     {
         public FBNeoParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of provided file
             var xmlStream = File.OpenRead(XMLFile);

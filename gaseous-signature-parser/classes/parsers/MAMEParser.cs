@@ -9,14 +9,26 @@ using System.Diagnostics;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class MAMEParser
+    public class MAMEParser : IParser
     {
         public MAMEParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, parser.SignatureParser DocumentType)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        {
+            // Extract DocumentType from options
+            parser.SignatureParser DocumentType = parser.SignatureParser.Unknown;
+            if (options != null && options.ContainsKey("DocumentType"))
+            {
+                DocumentType = (parser.SignatureParser)options["DocumentType"];
+            }
+
+            return ParseInternal(XMLFile, DocumentType);
+        }
+
+        private RomSignatureObject ParseInternal(string XMLFile, parser.SignatureParser DocumentType)
         {
             // get hashes of provided file
             var xmlStream = File.OpenRead(XMLFile);

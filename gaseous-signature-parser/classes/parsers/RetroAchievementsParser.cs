@@ -7,14 +7,14 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class RetroAchievementsParser
+    public class RetroAchievementsParser : IParser
     {
         public RetroAchievementsParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // load resources
             var assembly = Assembly.GetExecutingAssembly();
