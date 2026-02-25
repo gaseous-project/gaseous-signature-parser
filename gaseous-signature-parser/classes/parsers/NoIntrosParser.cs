@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using gaseous_signature_parser.models.RomSignatureObject;
+using gaseous_signature_parser.models;
 
 namespace gaseous_signature_parser.classes.parsers
 {
@@ -113,6 +114,7 @@ namespace gaseous_signature_parser.classes.parsers
                 //     continue;
                 // }
 
+                string idValue = idAttribute != null ? idAttribute.Value : "";
                 if (idAttribute != null)
                 {
                     if (long.TryParse(idAttribute.Value, out _) == true)
@@ -141,13 +143,11 @@ namespace gaseous_signature_parser.classes.parsers
 
                 gameObject.System = SystemName;
 
-                // parse game name
-                string[] gameNameTitleParts = xmlGame.Attributes["name"].Value.Split("(");
-                string gameName = gameNameTitleParts[0];
-
-                string[] gameNameTokens = gameName.Split("(");
-                // game title should be first item
-                gameObject.Name = gameNameTokens[0].Trim();
+                NameParseModel gameName = ParseName(xmlGame.Attributes["name"].Value, idValue);
+                gameObject.Name = gameName.Name;
+                gameObject.Country = gameName.Country;
+                gameObject.Language = gameName.Language;
+                gameObject.Year = gameName.ReleaseDate != null ? gameName.ReleaseDate.ToString() : "";
 
                 gameObject.Roms = new List<RomSignatureObject.Game.Rom>();
 
@@ -162,6 +162,14 @@ namespace gaseous_signature_parser.classes.parsers
 
                         case "description":
                             gameObject.Description = xmlGameDetail.InnerText;
+                            if (String.IsNullOrEmpty(idValue) == false)
+                            {
+                                string idPrefix = idValue + " - ";
+                                if (gameObject.Description.StartsWith(idPrefix, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    gameObject.Description = gameObject.Description.Substring(idPrefix.Length);
+                                }
+                            }
                             break;
 
                         case "game_id":
@@ -183,6 +191,10 @@ namespace gaseous_signature_parser.classes.parsers
                                     {
                                         case "name":
                                             romObject.Name = attribute.Value;
+                                            NameParseModel romName = ParseName(attribute.Value);
+                                            romObject.Country = romName.Country;
+                                            romObject.Language = romName.Language;
+                                            romObject.DevelopmentStatus = romName.DevelopmentStatus?.Code;
                                             break;
 
                                         case "size":
@@ -535,6 +547,103 @@ namespace gaseous_signature_parser.classes.parsers
             }
 
             return parser.SignatureParser.Unknown;
+        }
+
+        private static NameParseModel ParseName(string? Name, string idValue = "")
+        {
+            NameParseModel model = new NameParseModel();
+
+            if (String.IsNullOrEmpty(Name))
+            {
+                return model;
+            }
+
+            // parse game name
+            string[] gameNameTitleParts = Name.Split("(");
+            string gameName = gameNameTitleParts[0].Trim();
+
+            // if gameObject.Id is not empty, check that game doesn't start with the id and a dash
+            if (String.IsNullOrEmpty(idValue) == false)
+            {
+                string idPrefix = idValue + " - ";
+                if (gameName.StartsWith(idPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    gameName = gameName.Substring(idPrefix.Length);
+                }
+            }
+            model.Name = gameName;
+
+            if (new string[] { "x536", "x537" }.Contains(idValue))
+            {
+                Console.WriteLine("Debug");
+            }
+
+            // check remaining gameNameTitleParts for country and language information - these are expected to be in brackets after the game name, with the country/region in the 2nd token and the language in the 3rd token (if present), but could be in any order and may not be present at all - so we need to check each token to see if it contains country or language information and parse accordingly
+            bool namePart = true;
+            model.Country = new Dictionary<string, string>();
+            model.Language = new Dictionary<string, string>();
+            foreach (string gameNameTitlePart in gameNameTitleParts)
+            {
+                if (namePart == true)
+                {
+                    // name part is already parsed - skip it
+                    namePart = false;
+                    continue;
+                }
+
+                // strip any trailing )
+                string partString = gameNameTitlePart.Trim().Trim(")".ToCharArray()).Trim();
+                string[] partStringComponents = partString.Split(",");
+
+                foreach (string partStringComponent in partStringComponents)
+                {
+                    // check if the string is a country name
+                    KeyValuePair<string, string>? country = CountryLookup.ParseCountryString(partStringComponent.Trim());
+                    if (country != null)
+                    {
+                        // this is a country, add it to the country dictionary
+                        if (!model.Country.ContainsKey(country.Value.Key))
+                        {
+                            model.Country.Add(country.Value.Key, country.Value.Value);
+                        }
+                    }
+                    else
+                    {
+                        // check if the string is a language
+                        KeyValuePair<string, string>? language = LanguageLookup.ParseLanguageString(partStringComponent);
+                        if (language != null)
+                        {
+                            // this is a language, add it to the language dictionary
+                            if (!model.Language.ContainsKey(language.Value.Key))
+                            {
+                                model.Language.Add(language.Value.Key, language.Value.Value);
+                            }
+                        }
+                        else
+                        {
+                            // check if the string is a date
+                            // it could be in the format YYYY or YYYY-MM or YYYY-MM-DD, so we need to try all of these formats to see if it can be parsed as a date
+                            DateTime releaseDate;
+                            if (DateTime.TryParseExact(partStringComponent.Trim(), "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out releaseDate) ||
+                                DateTime.TryParseExact(partStringComponent.Trim(), "yyyy-MM", null, System.Globalization.DateTimeStyles.None, out releaseDate) ||
+                                DateTime.TryParseExact(partStringComponent.Trim(), "yyyy", null, System.Globalization.DateTimeStyles.None, out releaseDate))
+                            {
+                                model.ReleaseDate = releaseDate;
+                            }
+                            else
+                            {
+                                // check if the string is a development status
+                                DevelopmentStatusItem? developmentStatus = DevelopmentStatusLookup.ParseStatusString(partStringComponent.Trim());
+                                if (developmentStatus != null)
+                                {
+                                    model.DevelopmentStatus = developmentStatus;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return model;
         }
     }
 }
