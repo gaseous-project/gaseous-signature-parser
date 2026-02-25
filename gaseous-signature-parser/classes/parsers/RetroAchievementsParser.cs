@@ -16,59 +16,13 @@ namespace gaseous_signature_parser.classes.parsers
 
         public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
-            // load resources
-            var assembly = Assembly.GetExecutingAssembly();
-            // load systems list
-            List<string> TOSECSystems = new List<string>();
-            var resourceName = "gaseous_signature_parser.support.parsers.tosec.Systems.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                TOSECSystems = reader.ReadToEnd().Split(Environment.NewLine).ToList<string>();
-            }
-            // load video list
-            List<string> TOSECVideo = new List<string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.Video.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                TOSECVideo = reader.ReadToEnd().Split(Environment.NewLine).ToList<string>();
-            }
-            // load copyright list
-            Dictionary<string, string> TOSECCopyright = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.Copyright.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECCopyright.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-            // load development status list
-            Dictionary<string, string> TOSECDevelopment = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.DevelopmentStatus.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECDevelopment.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-
             // get hashes of RetroAchievements file
             var xmlStream = File.OpenRead(XMLFile);
 
-            var md5 = MD5.Create();
-            byte[] md5HashByte = md5.ComputeHash(xmlStream);
-            string md5Hash = BitConverter.ToString(md5HashByte).Replace("-", "").ToLowerInvariant();
-
-            var sha1 = SHA1.Create();
-            byte[] sha1HashByte = sha1.ComputeHash(xmlStream);
-            string sha1Hash = BitConverter.ToString(sha1HashByte).Replace("-", "").ToLowerInvariant();
+            // get hashes of the XML file
+            var hashes = Hash.GenerateHashes(xmlStream);
+            string md5Hash = hashes.md5;
+            string sha1Hash = hashes.sha1;
 
             // load RetroAchievements file
             XmlDocument retroachievementsXmlDoc = new XmlDocument();
@@ -319,12 +273,12 @@ namespace gaseous_signature_parser.classes.parsers
                                                 }
                                                 else
                                                 {
-                                                    // check for development status
                                                     if (developmentStatusFound == false)
                                                     {
-                                                        if (TOSECDevelopment.Keys.Any(v => v.Equals(part.Trim(), StringComparison.OrdinalIgnoreCase)))
+                                                        var devStatus = DevelopmentStatusLookup.ParseStatusString(part);
+                                                        if (devStatus != null)
                                                         {
-                                                            romObject.DevelopmentStatus = TOSECDevelopment[part.ToLower()];
+                                                            romObject.DevelopmentStatus = devStatus.Code;
                                                             developmentStatusFound = true;
                                                         }
                                                     }
