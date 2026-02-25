@@ -144,9 +144,9 @@ if (datPath != null && datPath.Length > 0)
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-
+            Console.WriteLine("Error parsing " + datPathFile + " : " + ex.Message);
         }
     }
     Console.WriteLine("");

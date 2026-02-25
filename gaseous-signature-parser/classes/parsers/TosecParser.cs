@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using gaseous_signature_parser.models.RomSignatureObject;
+using gaseous_signature_parser.models;
 
 namespace gaseous_signature_parser.classes.parsers
 {
@@ -44,18 +45,6 @@ namespace gaseous_signature_parser.classes.parsers
                 {
                     string[] line = reader.ReadLine().Split(",");
                     TOSECCopyright.Add(line[0], line[1]);
-                } while (reader.EndOfStream == false);
-            }
-            // load development status list
-            Dictionary<string, string> TOSECDevelopment = new Dictionary<string, string>();
-            resourceName = "gaseous_signature_parser.support.parsers.tosec.DevelopmentStatus.txt";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                do
-                {
-                    string[] line = reader.ReadLine().Split(",");
-                    TOSECDevelopment.Add(line[0], line[1]);
                 } while (reader.EndOfStream == false);
             }
 
@@ -423,10 +412,11 @@ namespace gaseous_signature_parser.classes.parsers
                                     // replace the extra closing bracket
                                     string token = tokenSplit[0].Replace(")", "").Trim();
 
-                                    // check for copyright
-                                    if (TOSECDevelopment.ContainsKey(token))
+                                    // check for development status
+                                    DevelopmentStatusItem? devStatus = DevelopmentStatusLookup.ParseStatusString(token);
+                                    if (devStatus != null)
                                     {
-                                        romObject.DevelopmentStatus = token;
+                                        romObject.DevelopmentStatus = devStatus.Code;
                                     }
 
                                     // check for media type
