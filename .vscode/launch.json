@@ -22,7 +22,7 @@
                 "-dbpath",
                 "${env:HOME}/Development/Signatures/NoIntro/DB",
                 "-outpath",
-                "${env:HOME}/Development/Signatures/Output",
+                "${env:HOME}/Development/Signatures/Output"
             ]
         }
     ]

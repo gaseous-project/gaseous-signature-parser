@@ -7,25 +7,22 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class WHDLoadParser
+    public class WHDLoadParser : BaseParser
     {
         public WHDLoadParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of WHDLoad file
             var xmlStream = File.OpenRead(XMLFile);
 
-            var md5 = MD5.Create();
-            byte[] md5HashByte = md5.ComputeHash(xmlStream);
-            string md5Hash = BitConverter.ToString(md5HashByte).Replace("-", "").ToLowerInvariant();
-
-            var sha1 = SHA1.Create();
-            byte[] sha1HashByte = sha1.ComputeHash(xmlStream);
-            string sha1Hash = BitConverter.ToString(sha1HashByte).Replace("-", "").ToLowerInvariant();
+            // get hashes of the XML file
+            var hashes = Hash.GenerateHashes(xmlStream);
+            string md5Hash = hashes.md5;
+            string sha1Hash = hashes.sha1;
 
             // load WHDLoad file
             XmlDocument whdloadXmlDoc = new XmlDocument();
@@ -148,7 +145,7 @@ namespace gaseous_signature_parser.classes.parsers
             return whdloadObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             try
             {

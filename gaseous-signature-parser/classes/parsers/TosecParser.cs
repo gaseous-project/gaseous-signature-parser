@@ -8,14 +8,14 @@ using gaseous_signature_parser.models;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class TosecParser
+    public class TosecParser : BaseParser
     {
         public TosecParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // load resources
             var assembly = Assembly.GetExecutingAssembly();
@@ -48,80 +48,14 @@ namespace gaseous_signature_parser.classes.parsers
                 } while (reader.EndOfStream == false);
             }
 
-            // get hashes of TOSEC file
-            var xmlStream = File.OpenRead(XMLFile);
-
-            var md5 = MD5.Create();
-            byte[] md5HashByte = md5.ComputeHash(xmlStream);
-            string md5Hash = BitConverter.ToString(md5HashByte).Replace("-", "").ToLowerInvariant();
-
-            var sha1 = SHA1.Create();
-            byte[] sha1HashByte = sha1.ComputeHash(xmlStream);
-            string sha1Hash = BitConverter.ToString(sha1HashByte).Replace("-", "").ToLowerInvariant();
-
             // load TOSEC file
-            XmlDocument tosecXmlDoc = new XmlDocument();
-            tosecXmlDoc.Load(XMLFile);
+            XmlDocument tosecXmlDoc = InitializeFromFile(XMLFile, out string md5Hash, out string sha1Hash);
 
             RomSignatureObject tosecObject = new RomSignatureObject();
 
             // get header
             XmlNode xmlHeader = tosecXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-            tosecObject.SourceType = "TOSEC";
-            tosecObject.SourceMd5 = md5Hash;
-            tosecObject.SourceSHA1 = sha1Hash;
-            foreach (XmlNode childNode in xmlHeader.ChildNodes)
-            {
-                switch (childNode.Name.ToLower())
-                {
-                    case "name":
-                        tosecObject.Name = childNode.InnerText;
-                        break;
-
-                    case "description":
-                        tosecObject.Description = childNode.InnerText;
-                        break;
-
-                    case "category":
-                        tosecObject.Category = childNode.InnerText;
-                        break;
-
-                    case "version":
-                        tosecObject.Version = childNode.InnerText;
-                        break;
-
-                    case "author":
-                        tosecObject.Author = childNode.InnerText;
-                        break;
-
-                    case "email":
-                        tosecObject.Email = childNode.InnerText;
-                        break;
-
-                    case "homepage":
-                        tosecObject.Homepage = childNode.InnerText;
-                        break;
-
-                    case "url":
-                        try
-                        {
-                            string uriString = childNode.InnerText;
-                            if (uriString.StartsWith("http://") || uriString.StartsWith("https://"))
-                            {
-                                tosecObject.Url = new Uri(uriString);
-                            }
-                            else
-                            {
-                                tosecObject.Url = new Uri("http://" + uriString);
-                            }
-                        }
-                        catch
-                        {
-                            tosecObject.Url = null;
-                        }
-                        break;
-                }
-            }
+            ParseHeader(tosecObject, xmlHeader, "TOSEC", md5Hash, sha1Hash);
 
             // get games
             tosecObject.Games = new List<RomSignatureObject.Game>();
@@ -567,7 +501,7 @@ namespace gaseous_signature_parser.classes.parsers
             return tosecObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             try
             {

@@ -7,14 +7,14 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class PureDOSDATParser
+    public class PureDOSDATParser : BaseParser
     {
         public PureDOSDATParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of PureDOSDAT file
             string md5Hash = string.Empty;
@@ -26,24 +26,10 @@ namespace gaseous_signature_parser.classes.parsers
                     throw new ArgumentException("The XML file is empty.", nameof(XMLFile));
                 }
 
-                // Compute MD5 and SHA1 hashes
-                using (var md5 = MD5.Create())
-                {
-                    byte[] md5HashByte = md5.ComputeHash(xmlStream);
-                    md5Hash = BitConverter.ToString(md5HashByte).Replace("-", "").ToLowerInvariant();
-                }
-
-                // Reset the stream position to the beginning before computing the SHA1 hash
-                xmlStream.Position = 0;
-
-                using (var sha1 = SHA1.Create())
-                {
-                    byte[] sha1HashByte = sha1.ComputeHash(xmlStream);
-                    sha1Hash = BitConverter.ToString(sha1HashByte).Replace("-", "").ToLowerInvariant();
-                }
-
-                // Reset the stream position to the beginning for XML loading
-                xmlStream.Position = 0;
+                // get hashes of the XML file
+                var hashes = Hash.GenerateHashes(xmlStream);
+                md5Hash = hashes.md5;
+                sha1Hash = hashes.sha1;
 
                 // load PureDOSDAT file
                 XmlDocument pureDosDatXmlDoc = new XmlDocument();
@@ -53,61 +39,7 @@ namespace gaseous_signature_parser.classes.parsers
 
                 // get header
                 XmlNode xmlHeader = pureDosDatXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-                pureDosDatObject.SourceType = "PureDOSDAT";
-                pureDosDatObject.SourceMd5 = md5Hash;
-                pureDosDatObject.SourceSHA1 = sha1Hash;
-                foreach (XmlNode childNode in xmlHeader.ChildNodes)
-                {
-                    switch (childNode.Name.ToLower())
-                    {
-                        case "name":
-                            pureDosDatObject.Name = childNode.InnerText;
-                            break;
-
-                        case "description":
-                            pureDosDatObject.Description = childNode.InnerText;
-                            break;
-
-                        case "category":
-                            pureDosDatObject.Category = childNode.InnerText;
-                            break;
-
-                        case "version":
-                            pureDosDatObject.Version = childNode.InnerText;
-                            break;
-
-                        case "author":
-                            pureDosDatObject.Author = childNode.InnerText;
-                            break;
-
-                        case "email":
-                            pureDosDatObject.Email = childNode.InnerText;
-                            break;
-
-                        case "homepage":
-                            pureDosDatObject.Homepage = childNode.InnerText;
-                            break;
-
-                        case "url":
-                            try
-                            {
-                                string uriString = childNode.InnerText;
-                                if (uriString.StartsWith("http://") || uriString.StartsWith("https://"))
-                                {
-                                    pureDosDatObject.Url = new Uri(uriString);
-                                }
-                                else
-                                {
-                                    pureDosDatObject.Url = new Uri("http://" + uriString);
-                                }
-                            }
-                            catch
-                            {
-                                pureDosDatObject.Url = null;
-                            }
-                            break;
-                    }
-                }
+                ParseHeader(pureDosDatObject, xmlHeader, "PureDOSDAT", md5Hash, sha1Hash);
 
                 // get games
                 pureDosDatObject.Games = new List<RomSignatureObject.Game>();
@@ -266,7 +198,7 @@ namespace gaseous_signature_parser.classes.parsers
             }
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 
