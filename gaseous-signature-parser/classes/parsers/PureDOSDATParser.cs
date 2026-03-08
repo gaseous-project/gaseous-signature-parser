@@ -7,14 +7,14 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class PureDOSDATParser : IParser
+    public class PureDOSDATParser : BaseParser
     {
         public PureDOSDATParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of PureDOSDAT file
             string md5Hash = string.Empty;
@@ -39,61 +39,7 @@ namespace gaseous_signature_parser.classes.parsers
 
                 // get header
                 XmlNode xmlHeader = pureDosDatXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-                pureDosDatObject.SourceType = "PureDOSDAT";
-                pureDosDatObject.SourceMd5 = md5Hash;
-                pureDosDatObject.SourceSHA1 = sha1Hash;
-                foreach (XmlNode childNode in xmlHeader.ChildNodes)
-                {
-                    switch (childNode.Name.ToLower())
-                    {
-                        case "name":
-                            pureDosDatObject.Name = childNode.InnerText;
-                            break;
-
-                        case "description":
-                            pureDosDatObject.Description = childNode.InnerText;
-                            break;
-
-                        case "category":
-                            pureDosDatObject.Category = childNode.InnerText;
-                            break;
-
-                        case "version":
-                            pureDosDatObject.Version = childNode.InnerText;
-                            break;
-
-                        case "author":
-                            pureDosDatObject.Author = childNode.InnerText;
-                            break;
-
-                        case "email":
-                            pureDosDatObject.Email = childNode.InnerText;
-                            break;
-
-                        case "homepage":
-                            pureDosDatObject.Homepage = childNode.InnerText;
-                            break;
-
-                        case "url":
-                            try
-                            {
-                                string uriString = childNode.InnerText;
-                                if (uriString.StartsWith("http://") || uriString.StartsWith("https://"))
-                                {
-                                    pureDosDatObject.Url = new Uri(uriString);
-                                }
-                                else
-                                {
-                                    pureDosDatObject.Url = new Uri("http://" + uriString);
-                                }
-                            }
-                            catch
-                            {
-                                pureDosDatObject.Url = null;
-                            }
-                            break;
-                    }
-                }
+                ParseHeader(pureDosDatObject, xmlHeader, "PureDOSDAT", md5Hash, sha1Hash);
 
                 // get games
                 pureDosDatObject.Games = new List<RomSignatureObject.Game>();
@@ -252,7 +198,7 @@ namespace gaseous_signature_parser.classes.parsers
             }
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 

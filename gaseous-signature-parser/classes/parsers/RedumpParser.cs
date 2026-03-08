@@ -7,78 +7,23 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class RedumpParser : IParser
+    public class RedumpParser : BaseParser
     {
         public RedumpParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
-            // get hashes of Redump file
-            var xmlStream = File.OpenRead(XMLFile);
-
-            // get hashes of the XML file
-            var hashes = Hash.GenerateHashes(xmlStream);
-            string md5Hash = hashes.md5;
-            string sha1Hash = hashes.sha1;
-
             // load Redump file
-            XmlDocument redumpXmlDoc = new XmlDocument();
-            redumpXmlDoc.Load(XMLFile);
+            XmlDocument redumpXmlDoc = InitializeFromFile(XMLFile, out string md5Hash, out string sha1Hash);
 
             RomSignatureObject redumpObject = new RomSignatureObject();
 
             // get header
             XmlNode xmlHeader = redumpXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-            redumpObject.SourceType = "Redump";
-            redumpObject.SourceMd5 = md5Hash;
-            redumpObject.SourceSHA1 = sha1Hash;
-            foreach (XmlNode childNode in xmlHeader.ChildNodes)
-            {
-                switch (childNode.Name.ToLower())
-                {
-                    case "name":
-                        redumpObject.Name = childNode.InnerText;
-                        break;
-
-                    case "description":
-                        redumpObject.Description = childNode.InnerText;
-                        break;
-
-                    case "category":
-                        redumpObject.Category = childNode.InnerText;
-                        break;
-
-                    case "version":
-                        redumpObject.Version = childNode.InnerText;
-                        break;
-
-                    case "author":
-                        redumpObject.Author = childNode.InnerText;
-                        break;
-
-                    case "email":
-                        redumpObject.Email = childNode.InnerText;
-                        break;
-
-                    case "homepage":
-                        redumpObject.Homepage = childNode.InnerText;
-                        break;
-
-                    case "url":
-                        try
-                        {
-                            redumpObject.Url = new Uri(childNode.InnerText);
-                        }
-                        catch
-                        {
-                            redumpObject.Url = null;
-                        }
-                        break;
-                }
-            }
+            ParseHeader(redumpObject, xmlHeader, "Redump", md5Hash, sha1Hash);
 
             // get games
             redumpObject.Games = new List<RomSignatureObject.Game>();
@@ -377,7 +322,7 @@ namespace gaseous_signature_parser.classes.parsers
             return redumpObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 

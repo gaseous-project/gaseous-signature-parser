@@ -7,78 +7,23 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class RetroAchievementsParser : IParser
+    public class RetroAchievementsParser : BaseParser
     {
         public RetroAchievementsParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
-            // get hashes of RetroAchievements file
-            var xmlStream = File.OpenRead(XMLFile);
-
-            // get hashes of the XML file
-            var hashes = Hash.GenerateHashes(xmlStream);
-            string md5Hash = hashes.md5;
-            string sha1Hash = hashes.sha1;
-
             // load RetroAchievements file
-            XmlDocument retroachievementsXmlDoc = new XmlDocument();
-            retroachievementsXmlDoc.Load(XMLFile);
+            XmlDocument retroachievementsXmlDoc = InitializeFromFile(XMLFile, out string md5Hash, out string sha1Hash);
 
             RomSignatureObject retroachievementsObject = new RomSignatureObject();
 
             // get header
             XmlNode xmlHeader = retroachievementsXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-            retroachievementsObject.SourceType = "RetroAchievements";
-            retroachievementsObject.SourceMd5 = md5Hash;
-            retroachievementsObject.SourceSHA1 = sha1Hash;
-            foreach (XmlNode childNode in xmlHeader.ChildNodes)
-            {
-                switch (childNode.Name.ToLower())
-                {
-                    case "name":
-                        retroachievementsObject.Name = childNode.InnerText;
-                        break;
-
-                    case "description":
-                        retroachievementsObject.Description = childNode.InnerText;
-                        break;
-
-                    case "category":
-                        retroachievementsObject.Category = childNode.InnerText;
-                        break;
-
-                    case "version":
-                        retroachievementsObject.Version = childNode.InnerText;
-                        break;
-
-                    case "author":
-                        retroachievementsObject.Author = childNode.InnerText;
-                        break;
-
-                    case "email":
-                        retroachievementsObject.Email = childNode.InnerText;
-                        break;
-
-                    case "homepage":
-                        retroachievementsObject.Homepage = childNode.InnerText;
-                        break;
-
-                    case "url":
-                        try
-                        {
-                            retroachievementsObject.Url = new Uri(childNode.InnerText);
-                        }
-                        catch
-                        {
-                            retroachievementsObject.Url = null;
-                        }
-                        break;
-                }
-            }
+            ParseHeader(retroachievementsObject, xmlHeader, "RetroAchievements", md5Hash, sha1Hash);
 
             // get games
             retroachievementsObject.Games = new List<RomSignatureObject.Game>();
@@ -350,7 +295,7 @@ namespace gaseous_signature_parser.classes.parsers
             return retroachievementsObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             if (xml.DocumentElement == null)
             {

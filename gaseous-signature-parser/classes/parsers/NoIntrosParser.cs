@@ -8,14 +8,14 @@ using gaseous_signature_parser.models;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class NoIntrosParser : IParser
+    public class NoIntrosParser : BaseParser
     {
         public NoIntrosParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // Extract dbXMLFile from options
             string? dbXMLFile = null;
@@ -29,75 +29,15 @@ namespace gaseous_signature_parser.classes.parsers
 
         private RomSignatureObject ParseInternal(string XMLFile, string? dbXMLFile)
         {
-            // get hashes of NoIntros file
-            var xmlStream = File.OpenRead(XMLFile);
-
-            // get hashes of the XML file
-            var hashes = Hash.GenerateHashes(xmlStream);
-            string md5Hash = hashes.md5;
-            string sha1Hash = hashes.sha1;
-
             // load NoIntros file
-            XmlDocument noIntroXmlDoc = new XmlDocument();
-            noIntroXmlDoc.Load(XMLFile);
+            XmlDocument noIntroXmlDoc = InitializeFromFile(XMLFile, out string md5Hash, out string sha1Hash);
 
             RomSignatureObject noIntrosObject = new RomSignatureObject();
 
             // get header
             XmlNode xmlHeader = noIntroXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-            noIntrosObject.SourceType = "No-Intro";
-            noIntrosObject.SourceMd5 = md5Hash;
-            noIntrosObject.SourceSHA1 = sha1Hash;
-            string SystemName = "";
-            foreach (XmlNode childNode in xmlHeader.ChildNodes)
-            {
-                switch (childNode.Name.ToLower())
-                {
-                    case "id":
-                        noIntrosObject.Id = childNode.InnerText;
-                        break;
-
-                    case "name":
-                        noIntrosObject.Name = childNode.InnerText;
-                        SystemName = noIntrosObject.Name;
-                        break;
-
-                    case "description":
-                        noIntrosObject.Description = childNode.InnerText;
-                        break;
-
-                    case "category":
-                        noIntrosObject.Category = childNode.InnerText;
-                        break;
-
-                    case "version":
-                        noIntrosObject.Version = childNode.InnerText;
-                        break;
-
-                    case "author":
-                        noIntrosObject.Author = childNode.InnerText;
-                        break;
-
-                    case "email":
-                        noIntrosObject.Email = childNode.InnerText;
-                        break;
-
-                    case "homepage":
-                        noIntrosObject.Homepage = childNode.InnerText;
-                        break;
-
-                    case "url":
-                        try
-                        {
-                            noIntrosObject.Url = new Uri(childNode.InnerText);
-                        }
-                        catch
-                        {
-                            noIntrosObject.Url = null;
-                        }
-                        break;
-                }
-            }
+            ParseHeader(noIntrosObject, xmlHeader, "No-Intro", md5Hash, sha1Hash);
+            string SystemName = noIntrosObject.Name ?? "";
 
             XmlDocument? noIntroDbXmlDoc;
             if (File.Exists(dbXMLFile))
@@ -522,7 +462,7 @@ namespace gaseous_signature_parser.classes.parsers
             return null;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 

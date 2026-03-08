@@ -7,82 +7,32 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class MAMERedumpParser : IParser
+    public class MAMERedumpParser : BaseParser
     {
         public MAMERedumpParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
-            // get hashes of MAMERedump file
-            var xmlStream = File.OpenRead(XMLFile);
-
-            // get hashes of the XML file
-            var hashes = Hash.GenerateHashes(xmlStream);
-            string md5Hash = hashes.md5;
-            string sha1Hash = hashes.sha1;
-
             // load MAMERedump file
-            XmlDocument MAMERedumpXmlDoc = new XmlDocument();
-            MAMERedumpXmlDoc.Load(XMLFile);
+            XmlDocument MAMERedumpXmlDoc = InitializeFromFile(XMLFile, out string md5Hash, out string sha1Hash);
 
             RomSignatureObject MAMERedumpObject = new RomSignatureObject();
 
             // get header
             XmlNode xmlHeader = MAMERedumpXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
-            MAMERedumpObject.SourceType = "MAMERedump";
-            MAMERedumpObject.SourceMd5 = md5Hash;
-            MAMERedumpObject.SourceSHA1 = sha1Hash;
-            foreach (XmlNode childNode in xmlHeader.ChildNodes)
-            {
-                switch (childNode.Name.ToLower())
-                {
-                    case "name":
-                        MAMERedumpObject.Name = childNode.InnerText;
-                        break;
-
-                    case "description":
-                        MAMERedumpObject.Description = childNode.InnerText;
-                        break;
-
-                    case "category":
-                        MAMERedumpObject.Category = childNode.InnerText;
-                        break;
-
-                    case "version":
-                        MAMERedumpObject.Version = childNode.InnerText;
-                        break;
-
-                    case "author":
-                        MAMERedumpObject.Author = childNode.InnerText;
-                        break;
-
-                    case "email":
-                        MAMERedumpObject.Email = childNode.InnerText;
-                        break;
-
-                    case "homepage":
-                        MAMERedumpObject.Homepage = childNode.InnerText;
-                        break;
-
-                    case "url":
-                        try
-                        {
-                            MAMERedumpObject.Url = new Uri(childNode.InnerText);
-                        }
-                        catch
-                        {
-                            MAMERedumpObject.Url = null;
-                        }
-                        break;
-                }
-            }
+            ParseHeader(MAMERedumpObject, xmlHeader, "MAMERedump", md5Hash, sha1Hash);
 
             // get games
             MAMERedumpObject.Games = new List<RomSignatureObject.Game>();
             XmlNodeList xmlGames = MAMERedumpXmlDoc.DocumentElement.SelectNodes("/datafile/machine");
+            // MAME Redump sometimes uses the /datafile/game node instead of /datafile/machine, so if we don't find any machines, we'll look for games
+            if (xmlGames.Count == 0)
+            {
+                xmlGames = MAMERedumpXmlDoc.DocumentElement.SelectNodes("/datafile/game");
+            }
             foreach (XmlNode xmlGame in xmlGames)
             {
                 RomSignatureObject.Game gameObject = new RomSignatureObject.Game();
@@ -230,6 +180,7 @@ namespace gaseous_signature_parser.classes.parsers
                             break;
 
                         case "disk":
+                        case "rom":
                             // generate new ROM object
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
                             romObject.SignatureSource = RomSignatureObject.Game.Rom.SignatureSourceType.MAMERedump;
@@ -376,7 +327,7 @@ namespace gaseous_signature_parser.classes.parsers
             return MAMERedumpObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             XmlNode xmlHeader = xml.DocumentElement.SelectSingleNode("/datafile/header");
 

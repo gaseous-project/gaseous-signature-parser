@@ -7,14 +7,14 @@ using gaseous_signature_parser.models.RomSignatureObject;
 
 namespace gaseous_signature_parser.classes.parsers
 {
-    public class WHDLoadParser : IParser
+    public class WHDLoadParser : BaseParser
     {
         public WHDLoadParser()
         {
 
         }
 
-        public RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
+        public override RomSignatureObject Parse(string XMLFile, Dictionary<string, object>? options = null)
         {
             // get hashes of WHDLoad file
             var xmlStream = File.OpenRead(XMLFile);
@@ -145,7 +145,7 @@ namespace gaseous_signature_parser.classes.parsers
             return whdloadObject;
         }
 
-        public parser.SignatureParser GetXmlType(XmlDocument xml)
+        public override parser.SignatureParser GetXmlType(XmlDocument xml)
         {
             try
             {
