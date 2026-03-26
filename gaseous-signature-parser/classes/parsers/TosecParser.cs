@@ -57,6 +57,39 @@ namespace gaseous_signature_parser.classes.parsers
             XmlNode xmlHeader = tosecXmlDoc.DocumentElement.SelectSingleNode("/datafile/header");
             ParseHeader(tosecObject, xmlHeader, "TOSEC", md5Hash, sha1Hash);
 
+            string[] fileNameTokens = tosecObject.Name?.Split(" - ") ?? Array.Empty<string>();
+            List<string> fileTokens = new List<string>();
+            string fileType = "";
+            if (fileNameTokens != null && fileNameTokens.Length > 0)
+            {
+                for (int i = 0; i < fileNameTokens.Length; i++)
+                {
+                    if (i == 0)
+                    {
+                        // skip the first token, as this is the system name
+                        continue;
+                    }
+
+                    if (fileNameTokens[i].StartsWith('[') && fileNameTokens[i].EndsWith(']'))
+                    {
+                        // this is a file type, save it and skip it
+                        fileType = fileNameTokens[i].Replace("[", "").Replace("]", "").Trim();
+                        continue;
+                    }
+
+                    if (fileNameTokens[i].StartsWith('(') && fileNameTokens[i].EndsWith(')'))
+                    {
+                        // this is a file token, so we can skip it
+                        continue;
+                    }
+
+                    if (!fileTokens.Contains(fileNameTokens[i], StringComparer.CurrentCultureIgnoreCase))
+                    {
+                        fileTokens.Add(fileNameTokens[i]);
+                    }
+                }
+            }
+
             // get games
             tosecObject.Games = new List<RomSignatureObject.Game>();
             XmlNodeList xmlGames = tosecXmlDoc.DocumentElement.SelectNodes("/datafile/game");
@@ -315,7 +348,15 @@ namespace gaseous_signature_parser.classes.parsers
 
                         case "rom":
                             RomSignatureObject.Game.Rom romObject = new RomSignatureObject.Game.Rom();
-                            romObject.Attributes = new Dictionary<string, object>();
+                            romObject.Attributes = new Dictionary<string, object>
+                            {
+                                { "categories", fileTokens }
+                            };
+                            if (!String.IsNullOrEmpty(fileType))
+                            {
+                                romObject.Attributes.Add("filetype", fileType);
+                            }
+
                             if (xmlGameDetail != null)
                             {
                                 romObject.Name = xmlGameDetail.Attributes["name"]?.Value;
@@ -399,7 +440,7 @@ namespace gaseous_signature_parser.classes.parsers
                                             token != gameObject.LanguageString &&
                                             token != romObject.DevelopmentStatus
                                         )
-                                       )
+                                        )
                                     {
                                         // likely the media label?
                                         romObject.MediaLabel = token;
