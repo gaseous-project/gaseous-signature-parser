@@ -163,6 +163,12 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     MAMERedump = 11,
 
                     /// <summary>
+                    /// https://www.screenscraper.fr
+                    /// Source is XML or JSON from ScreenScraper API
+                    /// </summary>
+                    ScreenScraper = 12,
+
+                    /// <summary>
                     /// Generic parser, used for custom parsers
                     /// </summary>
                     Generic = 99

@@ -3,13 +3,14 @@ using System.Diagnostics;
 using System.Xml;
 using System.IO;
 using gaseous_signature_parser.models.RomSignatureObject;
+using Newtonsoft.Json.Linq;
 
 namespace gaseous_signature_parser;
 
 public class parser
 {
     /// <summary>
-    /// Parse the XML DAT file into a RomSignatureObject.
+    /// Parse a supported signature file into a RomSignatureObject.
     /// </summary>
     /// <param name="PathToFile">The full path to the signature file to attempt to parse</param>
     /// <param name="Parser">Which parser to use when parsing the provided signature file</param>
@@ -63,6 +64,12 @@ public class parser
 
     private SignatureParser GetSignatureType(string PathToFile)
     {
+        char firstChar = ReadFirstNonWhitespaceCharacter(PathToFile);
+        if (firstChar == '{' || firstChar == '[')
+        {
+            return GetJsonSignatureType(PathToFile);
+        }
+
         XmlDocument XmlDoc = new XmlDocument();
         try
         {
@@ -76,6 +83,7 @@ public class parser
         // List of parser types to try (ordered by most common to least common for performance)
         var parserTypesToCheck = new[]
         {
+            SignatureParser.ScreenScraper,
             SignatureParser.TOSEC,
             SignatureParser.MAMEArcade, // MAMEParser handles both Arcade and Mess
             SignatureParser.NoIntro,
@@ -128,7 +136,43 @@ public class parser
         Pleasuredome = 10,
         MAMERedump = 11,
         Generic = 99,
+        ScreenScraper = 98,
         Unknown = 100
+    }
+
+    private static char ReadFirstNonWhitespaceCharacter(string path)
+    {
+        using StreamReader reader = new StreamReader(path);
+        int value;
+        while ((value = reader.Read()) != -1)
+        {
+            char current = (char)value;
+            if (!char.IsWhiteSpace(current))
+            {
+                return current;
+            }
+        }
+
+        return '\0';
+    }
+
+    private static SignatureParser GetJsonSignatureType(string pathToFile)
+    {
+        try
+        {
+            string content = File.ReadAllText(pathToFile);
+            if (classes.parsers.ScreenScraperParser.IsScreenScraperJson(content))
+            {
+                return SignatureParser.ScreenScraper;
+            }
+
+            JToken.Parse(content);
+            return SignatureParser.Unknown;
+        }
+        catch
+        {
+            return SignatureParser.Unknown;
+        }
     }
 
     public static Dictionary<string, object> ConvertXmlNodeToDictionary(XmlNode node)

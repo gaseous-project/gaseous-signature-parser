@@ -76,8 +76,9 @@ if (datPath != null && datPath.Length > 0)
     }
 
     string[] datPathContents_dat = Directory.GetFiles(datPath, "*.dat");
+    string[] datPathContents_json = Directory.GetFiles(datPath, "*.json");
     string[] datPathContents_xml = Directory.GetFiles(datPath, "*.xml");
-    string[] datPathContents = datPathContents_dat.Concat(datPathContents_xml).ToArray();
+    string[] datPathContents = datPathContents_dat.Concat(datPathContents_json).Concat(datPathContents_xml).ToArray();
     string[] dbPathContents = new string[0];
     if (dbPath != null)
     {
