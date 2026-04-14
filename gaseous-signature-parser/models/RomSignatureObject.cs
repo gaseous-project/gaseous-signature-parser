@@ -166,7 +166,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// https://www.screenscraper.fr
                     /// Source is XML or JSON from ScreenScraper API
                     /// </summary>
-                    ScreenScraper = 12,
+                    ScreenScraper = 98,
 
                     /// <summary>
                     /// Generic parser, used for custom parsers
