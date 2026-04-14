@@ -124,19 +124,19 @@ public class parser
     public enum SignatureParser
     {
         Auto = 0,
-        TOSEC = 1,
-        MAMEArcade = 2,
-        MAMEMess = 3,
-        NoIntro = 4,
-        Redump = 5,
-        WHDLoad = 6,
-        RetroAchievements = 7,
-        FBNeo = 8,
-        PureDOSDAT = 9,
-        Pleasuredome = 10,
-        MAMERedump = 11,
-        Generic = 99,
-        ScreenScraper = 98,
+        TOSEC = RomSignatureObject.Game.Rom.SignatureSourceType.TOSEC,
+        MAMEArcade = RomSignatureObject.Game.Rom.SignatureSourceType.MAMEArcade,
+        MAMEMess = RomSignatureObject.Game.Rom.SignatureSourceType.MAMEMess,
+        NoIntro = RomSignatureObject.Game.Rom.SignatureSourceType.NoIntros,
+        Redump = RomSignatureObject.Game.Rom.SignatureSourceType.Redump,
+        WHDLoad = RomSignatureObject.Game.Rom.SignatureSourceType.WHDLoad,
+        RetroAchievements = RomSignatureObject.Game.Rom.SignatureSourceType.RetroAchievements,
+        FBNeo = RomSignatureObject.Game.Rom.SignatureSourceType.FBNeo,
+        PureDOSDAT = RomSignatureObject.Game.Rom.SignatureSourceType.PureDOSDAT,
+        Pleasuredome = RomSignatureObject.Game.Rom.SignatureSourceType.Pleasuredome,
+        MAMERedump = RomSignatureObject.Game.Rom.SignatureSourceType.MAMERedump,
+        Generic = RomSignatureObject.Game.Rom.SignatureSourceType.Generic,
+        ScreenScraper = RomSignatureObject.Game.Rom.SignatureSourceType.ScreenScraper,
         Unknown = 100
     }
 
