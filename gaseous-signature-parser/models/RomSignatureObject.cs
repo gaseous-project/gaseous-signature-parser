@@ -31,7 +31,34 @@ namespace gaseous_signature_parser.models.RomSignatureObject
             public string? CloneOfId { get; set; }
             public string? GameId { get; set; }
             public string? Category { get; set; }
+            /// <summary>
+            /// The normalised name of the game, with all special characters, tags, dates, and other metadata removed.
+            /// </summary>
             public string? Name { get; set; }
+            /// <summary>
+            /// The normalised name of the game, with the release year (if present), and release country/region (if present).
+            /// </summary>
+            public string? SortingName
+            {
+                get
+                {
+                    string sortingName = Name ?? "";
+
+                    if (Year != null)
+                    {
+                        sortingName = sortingName + $" ({Year})";
+                    }
+
+                    if (Country != null && Country.Keys.Count > 0)
+                    {
+                        List<string> countryValues = new List<string>(Country.Keys.ToList() ?? new List<string>());
+                        countryValues.Sort((a, b) => b.Length.CompareTo(a.Length));
+                        sortingName = sortingName + $" ({String.Join(", ", countryValues)})";
+                    }
+
+                    return sortingName;
+                }
+            }
             public string? Description { get; set; }
             public string? Year { get; set; }
             public string? Publisher { get; set; }
