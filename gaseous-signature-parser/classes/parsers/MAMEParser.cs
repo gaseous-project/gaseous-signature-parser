@@ -75,7 +75,7 @@ namespace gaseous_signature_parser.classes.parsers
                         case "description":
                             if (childNode.InnerText.Contains("("))
                             {
-                                string[] nameParts = childNode.InnerText.Split(new string[] { " (" }, StringSplitOptions.None);
+                                string[] nameParts = childNode.InnerText.Split(new string[] { "(" }, StringSplitOptions.None);
                                 machineObject.Name = nameParts[0].Trim();
                                 if (nameParts.Length == 1)
                                 {
