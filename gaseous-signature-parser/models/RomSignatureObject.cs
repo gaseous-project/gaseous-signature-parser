@@ -44,7 +44,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 {
                     string sortingName = Name ?? "";
 
-                    if (Year != null)
+                    if (!String.IsNullOrEmpty(Year))
                     {
                         sortingName = sortingName + $" ({Year})";
                     }
