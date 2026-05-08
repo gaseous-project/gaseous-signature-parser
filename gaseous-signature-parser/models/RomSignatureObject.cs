@@ -44,16 +44,16 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                 {
                     string sortingName = Name ?? "";
 
-                    if (!String.IsNullOrEmpty(Year))
-                    {
-                        sortingName = sortingName + $" ({Year})";
-                    }
-
                     if (Country != null && Country.Keys.Count > 0)
                     {
                         List<string> countryValues = new List<string>(Country.Keys.ToList() ?? new List<string>());
                         countryValues.Sort((a, b) => b.Length.CompareTo(a.Length));
                         sortingName = sortingName + $" ({String.Join(", ", countryValues)})";
+                    }
+
+                    if (!String.IsNullOrEmpty(Year))
+                    {
+                        sortingName = sortingName + $" ({Year})";
                     }
 
                     return sortingName;

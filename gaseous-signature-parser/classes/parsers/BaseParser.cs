@@ -154,6 +154,13 @@ namespace gaseous_signature_parser.classes.parsers
                 Attributes = new Dictionary<string, object>(),
                 SignatureSource = signatureSource
             };
+            rom.Country = new Dictionary<string, string>();
+            rom.Language = new Dictionary<string, string>();
+
+            if (romNode.Attributes == null)
+            {
+                return rom;
+            }
 
             foreach (XmlAttribute romAttribute in romNode.Attributes)
             {
@@ -161,6 +168,37 @@ namespace gaseous_signature_parser.classes.parsers
                 {
                     case "name":
                         rom.Name = romAttribute.Value;
+
+                        // extract values from file name - they'll be surrounded by parentheses
+                        string[] nameParts = romAttribute.Value.Split(new string[] { "(" }, StringSplitOptions.None);
+                        foreach (string namePart in nameParts)
+                        {
+                            string[] detailsPart = namePart.Split(new string[] { ")" }, StringSplitOptions.None);
+                            if (detailsPart.Length > 0)
+                            {
+                                string detailsString = detailsPart[0];
+
+                                // check if it's a country code or country name
+                                KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(detailsString);
+                                if (countryItem != null)
+                                {
+                                    if (countryItem.HasValue && !rom.Country.ContainsKey(countryItem.Value.Key))
+                                    {
+                                        rom.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                    }
+                                }
+
+                                // check if it's a language code or language name
+                                KeyValuePair<string, string>? languageItem = LanguageLookup.ParseLanguageString(detailsString);
+                                if (languageItem != null)
+                                {
+                                    if (languageItem.HasValue && !rom.Language.ContainsKey(languageItem.Value.Key))
+                                    {
+                                        rom.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                    }
+                                }
+                            }
+                        }
                         break;
 
                     case "size":
