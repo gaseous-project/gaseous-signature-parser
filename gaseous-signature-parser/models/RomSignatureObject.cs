@@ -53,7 +53,31 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                     if (!String.IsNullOrEmpty(Year))
                     {
-                        sortingName = sortingName + $" ({Year})";
+                        // if the year is 19xx or 20xx, just add it in parenthesis
+                        if (Year == "19xx" || Year == "20xx")
+                        {
+                            sortingName = sortingName + $" ({Year})";
+                        }
+                        else
+                        {
+                            // if the year is in the range 1950 to current year + 1, add it in parenthesis
+                            if (int.TryParse(Year, out int yearValue))
+                            {
+                                int currentYear = DateTime.Now.Year;
+                                if (yearValue >= 1950 && yearValue <= currentYear + 1)
+                                {
+                                    sortingName = sortingName + $" ({Year})";
+                                }
+                            }
+                            else
+                            {
+                                // if the year is a valid date, format it as yyyy-MM-dd and add it in parenthesis
+                                if (DateTime.TryParse(Year, out DateTime yearDateValue))
+                                {
+                                    sortingName = sortingName + $" ({yearDateValue.ToString("yyyy-MM-dd")})";
+                                }
+                            }
+                        }
                     }
 
                     return sortingName;

@@ -123,7 +123,27 @@ namespace gaseous_signature_parser.classes.parsers
                             break;
                     }
                 }
-                signatureObject.Games.Add(machineObject);
+
+                // search for existing gameObject to update
+                bool existingGameFound = false;
+                foreach (RomSignatureObject.Game existingGame in signatureObject.Games)
+                {
+                    if (existingGame.SortingName == machineObject.SortingName &&
+                        existingGame.Year == machineObject.Year &&
+                        existingGame.Publisher == machineObject.Publisher // &&
+                                                                          // existingGame.Country == machineObject.Country &&
+                                                                          // existingGame.Language == machineObject.Language
+                        )
+                    {
+                        existingGame.Roms.AddRange(machineObject.Roms);
+                        existingGameFound = true;
+                        break;
+                    }
+                }
+                if (existingGameFound == false)
+                {
+                    signatureObject.Games.Add(machineObject);
+                }
             }
 
             return signatureObject;
