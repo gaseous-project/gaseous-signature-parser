@@ -189,12 +189,17 @@ namespace gaseous_signature_parser.classes.parsers
                                 }
 
                                 // check if it's a language code or language name
-                                KeyValuePair<string, string>? languageItem = LanguageLookup.ParseLanguageString(detailsString);
-                                if (languageItem != null)
+                                string[] languageDetailsPart = detailsString.Split(new string[] { "," }, StringSplitOptions.None);
+                                foreach (string languageDetail in languageDetailsPart)
                                 {
-                                    if (languageItem.HasValue && !rom.Language.ContainsKey(languageItem.Value.Key))
+                                    string trimmedLanguageDetail = languageDetail.Trim();
+                                    KeyValuePair<string, string>? languageItem = LanguageLookup.ParseLanguageString(trimmedLanguageDetail);
+                                    if (languageItem != null)
                                     {
-                                        rom.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                        if (languageItem.HasValue && !rom.Language.ContainsKey(languageItem.Value.Key))
+                                        {
+                                            rom.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                        }
                                     }
                                 }
                             }
