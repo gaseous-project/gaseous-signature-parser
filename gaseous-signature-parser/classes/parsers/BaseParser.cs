@@ -179,12 +179,17 @@ namespace gaseous_signature_parser.classes.parsers
                                 string detailsString = detailsPart[0];
 
                                 // check if it's a country code or country name
-                                KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(detailsString);
-                                if (countryItem != null)
+                                string[] countryDetailsPart = detailsString.Split(new string[] { "," }, StringSplitOptions.None);
+                                foreach (string countryDetail in countryDetailsPart)
                                 {
-                                    if (countryItem.HasValue && !rom.Country.ContainsKey(countryItem.Value.Key))
+                                    string trimmedCountryDetail = countryDetail.Trim();
+                                    KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(trimmedCountryDetail);
+                                    if (countryItem != null)
                                     {
-                                        rom.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                        if (countryItem.HasValue && !rom.Country.ContainsKey(countryItem.Value.Key))
+                                        {
+                                            rom.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                        }
                                     }
                                 }
 

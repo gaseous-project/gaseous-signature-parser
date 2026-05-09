@@ -81,7 +81,7 @@ namespace gaseous_signature_parser.classes.parsers
                                 // check if this is a country
                                 if (countryFound == false)
                                 {
-                                    string[] countries = part.Trim().Split("-");
+                                    string[] countries = part.Trim().Split(new[] { '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
                                     if (gameObject.Country == null)
                                     {
                                         gameObject.Country = new Dictionary<string, string>();
