@@ -127,7 +127,46 @@ namespace gaseous_signature_parser.classes.parsers
                                         switch (attribute.Name.ToLower())
                                         {
                                             case "name":
+                                                if (attribute.Value.Contains("Alone in the Dark 3"))
+                                                {
+                                                    int debug = 1;
+                                                }
+
                                                 romObject.Name = attribute.Value;
+                                                RomSignatureObject.Game.Rom romData = ParseRomAttributes(xmlGameDetail, RomSignatureObject.Game.Rom.SignatureSourceType.PureDOSDAT);
+                                                romObject.Country = romData.Country;
+                                                romObject.Language = romData.Language;
+
+                                                // bubble up country and language to gameObject flags
+                                                if (romObject.Country != null)
+                                                {
+                                                    if (gameObject.Country == null)
+                                                    {
+                                                        gameObject.Country = new Dictionary<string, string>();
+                                                    }
+                                                    foreach (KeyValuePair<string, string> country in romObject.Country)
+                                                    {
+                                                        if (!gameObject.Country.ContainsKey(country.Key))
+                                                        {
+                                                            gameObject.Country.Add(country.Key, country.Value);
+                                                        }
+                                                    }
+                                                }
+                                                if (romObject.Language != null)
+                                                {
+                                                    if (gameObject.Language == null)
+                                                    {
+                                                        gameObject.Language = new Dictionary<string, string>();
+                                                    }
+                                                    foreach (KeyValuePair<string, string> language in romObject.Language)
+                                                    {
+                                                        if (!gameObject.Language.ContainsKey(language.Key))
+                                                        {
+                                                            gameObject.Language.Add(language.Key, language.Value);
+                                                        }
+                                                    }
+                                                }
+
                                                 break;
 
                                             case "size":
@@ -177,11 +216,11 @@ namespace gaseous_signature_parser.classes.parsers
                     bool existingGameFound = false;
                     foreach (RomSignatureObject.Game existingGame in pureDosDatObject.Games)
                     {
-                        if (existingGame.Name == gameObject.Name &&
+                        if (existingGame.SortingName == gameObject.SortingName &&
                             existingGame.Year == gameObject.Year &&
-                            existingGame.Publisher == gameObject.Publisher &&
-                            existingGame.Country == gameObject.Country &&
-                            existingGame.Language == gameObject.Language)
+                            existingGame.Publisher == gameObject.Publisher) // &&
+                        // existingGame.Country == gameObject.Country &&
+                        // existingGame.Language == gameObject.Language)
                         {
                             existingGame.Roms.AddRange(gameObject.Roms);
                             existingGameFound = true;

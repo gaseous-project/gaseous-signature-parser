@@ -238,7 +238,7 @@ foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)
     {
-        if (gameObject.Name == SearchTitle)
+        if (gameObject.Name == SearchTitle || gameObject.SortingName == SearchTitle)
         {
             var jsonSerializerSettings = new JsonSerializerSettings();
             jsonSerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());

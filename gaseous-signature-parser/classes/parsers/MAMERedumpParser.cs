@@ -307,11 +307,12 @@ namespace gaseous_signature_parser.classes.parsers
                 bool existingGameFound = false;
                 foreach (RomSignatureObject.Game existingGame in MAMERedumpObject.Games)
                 {
-                    if (existingGame.Name == gameObject.Name &&
+                    if (existingGame.SortingName == gameObject.SortingName &&
                         existingGame.Year == gameObject.Year &&
-                        existingGame.Publisher == gameObject.Publisher &&
-                        existingGame.Country == gameObject.Country &&
-                        existingGame.Language == gameObject.Language)
+                        existingGame.Publisher == gameObject.Publisher // &&
+                                                                       // existingGame.Country == gameObject.Country &&
+                                                                       // existingGame.Language == gameObject.Language
+                        )
                     {
                         existingGame.Roms.AddRange(gameObject.Roms);
                         existingGameFound = true;
