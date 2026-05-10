@@ -309,9 +309,20 @@ namespace gaseous_signature_parser.classes.parsers
                     continue;
                 }
 
-                if (!countries.ContainsKey(item.region))
+                if (!countries.ContainsKey(item.region.ToUpperInvariant()))
                 {
-                    countries[item.region] = item.region;
+                    var countryItem = CountryLookup.ParseCountryString(item.region.ToUpperInvariant());
+                    if (countryItem != null)
+                    {
+                        if (countryItem.HasValue)
+                        {
+                            countries[item.region.ToUpperInvariant()] = countryItem.Value.Value;
+                        }
+                    }
+                    else
+                    {
+                        countries[item.region.ToUpperInvariant()] = item.region;
+                    }
                 }
             }
 
@@ -334,9 +345,20 @@ namespace gaseous_signature_parser.classes.parsers
                     continue;
                 }
 
-                if (!parsed.ContainsKey(item.langue))
+                if (!parsed.ContainsKey(item.langue.ToLowerInvariant()))
                 {
-                    parsed[item.langue] = item.langue;
+                    var languageItem = LanguageLookup.ParseLanguageString(item.langue);
+                    if (languageItem != null)
+                    {
+                        if (languageItem.HasValue)
+                        {
+                            parsed[item.langue.ToLowerInvariant()] = languageItem.Value.Value;
+                        }
+                    }
+                    else
+                    {
+                        parsed[item.langue.ToLowerInvariant()] = item.langue;
+                    }
                 }
             }
 

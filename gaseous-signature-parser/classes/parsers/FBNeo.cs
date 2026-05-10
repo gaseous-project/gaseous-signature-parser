@@ -55,6 +55,11 @@ namespace gaseous_signature_parser.classes.parsers
                 machineObject.Name = xmlMachine.Attributes["name"].Value;
                 machineObject.Description = xmlMachine.Attributes["name"].Value;
 
+                if (machineObject.Name == "4pak")
+                {
+                    int debug = 1;
+                }
+
                 if (xmlMachine.Attributes["sourcefile"] != null)
                 {
                     AddGameFlag(machineObject, "sourcefile", xmlMachine.Attributes["sourcefile"].Value);
@@ -68,7 +73,7 @@ namespace gaseous_signature_parser.classes.parsers
                             // parse the name, details in parenthesis contains the language
                             if (childNode.InnerText.Contains("("))
                             {
-                                string[] nameParts = childNode.InnerText.Split(new string[] { " (" }, StringSplitOptions.None);
+                                string[] nameParts = childNode.InnerText.Split(new string[] { "(" }, StringSplitOptions.None);
                                 machineObject.Name = nameParts[0].Trim();
                                 string titleDetails = nameParts[1].TrimEnd(')');
 
@@ -118,7 +123,27 @@ namespace gaseous_signature_parser.classes.parsers
                             break;
                     }
                 }
-                signatureObject.Games.Add(machineObject);
+
+                // search for existing gameObject to update
+                bool existingGameFound = false;
+                foreach (RomSignatureObject.Game existingGame in signatureObject.Games)
+                {
+                    if (existingGame.SortingName == machineObject.SortingName &&
+                        existingGame.Year == machineObject.Year &&
+                        existingGame.Publisher == machineObject.Publisher // &&
+                                                                          // existingGame.Country == machineObject.Country &&
+                                                                          // existingGame.Language == machineObject.Language
+                        )
+                    {
+                        existingGame.Roms.AddRange(machineObject.Roms);
+                        existingGameFound = true;
+                        break;
+                    }
+                }
+                if (existingGameFound == false)
+                {
+                    signatureObject.Games.Add(machineObject);
+                }
             }
 
             return signatureObject;

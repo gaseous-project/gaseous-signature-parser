@@ -18,7 +18,7 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Development/Signatures/ScreenScraper",
+                "${env:HOME}/Development/Signatures/MAMERedump/MAME Redump",
                 "-dbpath",
                 "${env:HOME}/Development/Signatures/NoIntro/DB",
                 "-outpath",

@@ -72,8 +72,13 @@ namespace gaseous_signature_parser.classes.parsers
                         bool dateFound = false;
                         for (int i = 0; i < gameNameParts.Count; i++)
                         {
-                            // remove trailing ')'
-                            string part = gameNameParts[i].Trim().TrimEnd(')');
+                            // remove the ')' and everything after it
+                            string part = gameNameParts[i].Trim();
+                            int closeParenIndex = part.IndexOf(')');
+                            if (closeParenIndex > 0)
+                            {
+                                part = part.Substring(0, closeParenIndex).Trim();
+                            }
 
                             string[] subParts = part.Split(',');
                             if (subParts.Length > 0)
@@ -194,14 +199,66 @@ namespace gaseous_signature_parser.classes.parsers
 
                                         // break the rom name into parts, each part is contained between parentheses
                                         string[] romNameParts = romName.Split('(').Skip(1).ToArray();
+                                        bool countryFound = false;
+                                        if (romObject.Country == null)
+                                        {
+                                            romObject.Country = new Dictionary<string, string>();
+                                        }
+                                        bool languageFound = false;
+                                        if (romObject.Language == null)
+                                        {
+                                            romObject.Language = new Dictionary<string, string>();
+                                        }
                                         bool readyForDiskName = false;
                                         bool developmentStatusFound = false;
                                         foreach (string romNamePart in romNameParts)
                                         {
-                                            // remove trailing ')'
-                                            string part = romNamePart.Trim().TrimEnd(')');
+                                            // remove the ')' and everything after it
+                                            string part = romNamePart.Trim();
+                                            int closeParenIndex = part.IndexOf(')');
+                                            if (closeParenIndex > 0)
+                                            {
+                                                part = part.Substring(0, closeParenIndex).Trim();
+                                            }
 
-                                            // we're checking roms, so we're not interested in regions or languages, only disk numbers and disk names
+                                            if (!countryFound)
+                                            {
+                                                // check if this is a country
+                                                KeyValuePair<string, string>? countryItem = CountryLookup.ParseCountryString(part);
+                                                if (countryItem != null)
+                                                {
+                                                    if (!romObject.Country.ContainsKey(countryItem.Value.Key))
+                                                    {
+                                                        romObject.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                                    }
+                                                    if (!gameObject.Country.ContainsKey(countryItem.Value.Key))
+                                                    {
+                                                        gameObject.Country.Add(countryItem.Value.Key, countryItem.Value.Value);
+                                                    }
+                                                    part = "";
+                                                    countryFound = true;
+                                                }
+                                            }
+
+                                            if (!languageFound)
+                                            {
+                                                // check if this is a language
+                                                KeyValuePair<string, string>? languageItem = LanguageLookup.ParseLanguageString(part);
+                                                if (languageItem != null)
+                                                {
+                                                    if (!romObject.Language.ContainsKey(languageItem.Value.Key))
+                                                    {
+                                                        romObject.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                                    }
+                                                    if (!gameObject.Language.ContainsKey(languageItem.Value.Key))
+                                                    {
+                                                        gameObject.Language.Add(languageItem.Value.Key, languageItem.Value.Value);
+                                                    }
+                                                    part = "";
+                                                    languageFound = true;
+                                                }
+                                            }
+
                                             if (part.StartsWith("disc", StringComparison.OrdinalIgnoreCase))
                                             {
                                                 // disk number
@@ -270,16 +327,16 @@ namespace gaseous_signature_parser.classes.parsers
                     }
                 }
 
-
                 // search for existing gameObject to update
                 bool existingGameFound = false;
                 foreach (RomSignatureObject.Game existingGame in retroachievementsObject.Games)
                 {
-                    if (existingGame.Name == gameObject.Name &&
+                    if (existingGame.SortingName == gameObject.SortingName &&
                         existingGame.Year == gameObject.Year &&
-                        existingGame.Publisher == gameObject.Publisher &&
-                        existingGame.Country == gameObject.Country &&
-                        existingGame.Language == gameObject.Language)
+                        existingGame.Publisher == gameObject.Publisher // &&
+                                                                       // existingGame.Country == gameObject.Country &&
+                                                                       // existingGame.Language == gameObject.Language
+                        )
                     {
                         existingGame.Roms.AddRange(gameObject.Roms);
                         existingGameFound = true;

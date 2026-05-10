@@ -75,7 +75,7 @@ namespace gaseous_signature_parser.classes.parsers
                         case "description":
                             if (childNode.InnerText.Contains("("))
                             {
-                                string[] nameParts = childNode.InnerText.Split(new string[] { " (" }, StringSplitOptions.None);
+                                string[] nameParts = childNode.InnerText.Split(new string[] { "(" }, StringSplitOptions.None);
                                 machineObject.Name = nameParts[0].Trim();
                                 if (nameParts.Length == 1)
                                 {
@@ -127,7 +127,27 @@ namespace gaseous_signature_parser.classes.parsers
                             break;
                     }
                 }
-                signatureObject.Games.Add(machineObject);
+
+                // search for existing gameObject to update
+                bool existingGameFound = false;
+                foreach (RomSignatureObject.Game existingGame in signatureObject.Games)
+                {
+                    if (existingGame.SortingName == machineObject.SortingName &&
+                        existingGame.Year == machineObject.Year &&
+                        existingGame.Publisher == machineObject.Publisher // &&
+                                                                          // existingGame.Country == machineObject.Country &&
+                                                                          // existingGame.Language == machineObject.Language
+                        )
+                    {
+                        existingGame.Roms.AddRange(machineObject.Roms);
+                        existingGameFound = true;
+                        break;
+                    }
+                }
+                if (existingGameFound == false)
+                {
+                    signatureObject.Games.Add(machineObject);
+                }
             }
 
             return signatureObject;

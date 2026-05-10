@@ -211,11 +211,12 @@ namespace gaseous_signature_parser.classes.parsers
                 bool existingGameFound = false;
                 foreach (RomSignatureObject.Game existingGame in noIntrosObject.Games)
                 {
-                    if (existingGame.Name == gameObject.Name &&
+                    if (existingGame.SortingName == gameObject.SortingName &&
                         existingGame.Year == gameObject.Year &&
-                        existingGame.Publisher == gameObject.Publisher &&
-                        existingGame.Country == gameObject.Country &&
-                        existingGame.Language == gameObject.Language)
+                        existingGame.Publisher == gameObject.Publisher // &&
+                                                                       // existingGame.Country == gameObject.Country &&
+                                                                       // existingGame.Language == gameObject.Language
+                        )
                     {
                         existingGame.Roms.AddRange(gameObject.Roms);
                         existingGameFound = true;
@@ -540,8 +541,8 @@ namespace gaseous_signature_parser.classes.parsers
                     continue;
                 }
 
-                // strip any trailing )
-                string partString = gameNameTitlePart.Trim().Trim(")".ToCharArray()).Trim();
+                // strip anything after a ")"
+                string partString = gameNameTitlePart.Split(")")[0].Trim();
                 string[] partStringComponents = partString.Split(",");
 
                 foreach (string partStringComponent in partStringComponents)
