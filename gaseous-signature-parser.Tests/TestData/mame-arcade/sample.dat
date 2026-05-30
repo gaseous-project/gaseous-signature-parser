@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>MAME</name>
+    <description>MAME Arcade</description>
+    <version>0.258</version>
+    <author>ProgettoSNAPS</author>
+    <homepage>ProgettoSNAPS</homepage>
+    <url>https://www.progettosnaps.net/</url>
+  </header>
+  <machine name="1942" sourcefile="1942.cpp">
+    <description>1942</description>
+    <year>1984</year>
+    <manufacturer>Capcom</manufacturer>
+    <rom name="1-d2.bin" size="16384" crc="b8020000" sha1="aabbccddeeff00112233445566778899aabbccdd"/>
+  </machine>
+  <machine name="donpachi" sourcefile="donpachi.cpp">
+    <description>DonPachi (Japan)</description>
+    <year>1995</year>
+    <manufacturer>Cave (AMI license)</manufacturer>
+    <rom name="u26.bin" size="65536" crc="f1234567" sha1="99887766554433221100ffeeddccbbaa99887766"/>
+  </machine>
+</datafile>

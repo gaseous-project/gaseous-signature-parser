@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>Nintendo - Game Boy</name>
+    <description>Nintendo - Game Boy</description>
+    <version>20230901-082826</version>
+    <author>no-intro</author>
+    <homepage>No-Intro</homepage>
+    <url>https://www.no-intro.org</url>
+  </header>
+  <game name="Tetris (World)" id="1">
+    <description>Tetris (World)</description>
+    <rom name="Tetris (World).gb" size="32768" crc="46df91ad" md5="982ed7f98dc08c69de9f3de3e79ed505" sha1="dbbdea84ac9e88d40b6e73cfc46afe4c8ece5cac"/>
+  </game>
+  <game name="Super Mario Land (World)" id="2">
+    <description>Super Mario Land (World)</description>
+    <rom name="Super Mario Land (World).gb" size="65536" crc="0e7ce1cb" md5="d0e99b0b11b93f79a7ce62c0df87e3f5" sha1="67c7cf8d7a2f6c38b87d9d394ad98571a2cdb2e8"/>
+  </game>
+</datafile>

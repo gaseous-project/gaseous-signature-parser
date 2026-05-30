@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<whdbooter>
+  <game filename="Aladdin.lha" sha1="aabbccddeeff00112233445566778899aabbccdd" md5="0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" size="393216" status="good">
+    <name>Aladdin</name>
+    <subpath>Aladdin</subpath>
+  </game>
+  <game filename="AnotherWorld.lha" sha1="99887766554433221100ffeeddccbbaa99887766" md5="fedcba9876543210fedcba9876543210" size="524288" status="good">
+    <name>Another World</name>
+    <subpath>AnotherWorld</subpath>
+  </game>
+</whdbooter>

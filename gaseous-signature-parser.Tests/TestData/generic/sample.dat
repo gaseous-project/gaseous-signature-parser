@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>Generic Collection</name>
+    <description>Generic Collection</description>
+    <version>1.0</version>
+    <author>Someone</author>
+    <homepage>Someone</homepage>
+    <url>https://example.com</url>
+  </header>
+  <machine name="somegame">
+    <description>Some Game</description>
+    <year>2000</year>
+    <manufacturer>SomePublisher</manufacturer>
+    <rom name="somegame.rom" size="131072" crc="abcd1234" md5="0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" sha1="aabbccddeeff00112233445566778899aabbccdd"/>
+  </machine>
+  <machine name="anothergame">
+    <description>Another Game</description>
+    <year>2001</year>
+    <manufacturer>AnotherPublisher</manufacturer>
+    <rom name="anothergame.rom" size="65536" crc="dcba4321" md5="fedcba9876543210fedcba9876543210" sha1="99887766554433221100ffeeddccbbaa99887766"/>
+  </machine>
+</datafile>

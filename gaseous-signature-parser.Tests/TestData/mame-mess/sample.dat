@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>MAME</name>
+    <description>MAME Home</description>
+    <version>0.258</version>
+    <author>ProgettoSNAPS</author>
+    <homepage>ProgettoSNAPS</homepage>
+    <url>https://www.progettosnaps.net/</url>
+  </header>
+  <machine name="a2600" sourcefile="atari2600.cpp">
+    <description>Atari 2600</description>
+    <year>1977</year>
+    <manufacturer>Atari</manufacturer>
+    <rom name="a2600.bin" size="4096" crc="a1234567" sha1="aabbccddeeff00112233445566778899aabbccdd"/>
+  </machine>
+</datafile>

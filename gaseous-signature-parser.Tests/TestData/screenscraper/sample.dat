@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Data>
+  <jeu id="1" romid="1" notgame="0">
+    <noms>
+      <nom region="ss">Tetris</nom>
+      <nom region="us">Tetris</nom>
+    </noms>
+    <systeme id="21" parentid="21" text="Super Nintendo" shortname="snes"/>
+    <editeur id="52" text="Nintendo"/>
+    <dates>
+      <date region="wor">1990</date>
+    </dates>
+    <roms>
+      <rom id="1" romfilename="Tetris (World).sfc" romsize="262144" romcrc="abcd1234" rommd5="0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" romsha1="aabbccddeeff00112233445566778899aabbccdd"/>
+    </roms>
+  </jeu>
+</Data>

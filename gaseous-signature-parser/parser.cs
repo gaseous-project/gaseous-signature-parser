@@ -17,6 +17,7 @@ public class parser
         SignatureParser.ScreenScraper,
         SignatureParser.TOSEC,
         SignatureParser.MAMEArcade, // MAMEParser handles both Arcade and Mess
+        SignatureParser.MAMEMess,
         SignatureParser.NoIntro,
         SignatureParser.Redump,
         SignatureParser.WHDLoad,
