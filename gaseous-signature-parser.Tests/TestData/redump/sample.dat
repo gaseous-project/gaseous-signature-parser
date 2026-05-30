@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>Nintendo - GameCube</name>
+    <description>Redump: Nintendo - GameCube</description>
+    <version>20230901</version>
+    <author>redump.org</author>
+    <homepage>redump.org</homepage>
+    <url>http://redump.org/datfile/gc/</url>
+  </header>
+  <game name="007 - Agent Under Fire (USA)">
+    <category>Games</category>
+    <description>007 - Agent Under Fire (USA)</description>
+    <rom name="007 - Agent Under Fire (USA).iso" size="1462722560" crc="ab1a2a5a" md5="5d4f7e3d9fce2b8f24e0a7c1b3e5d7f9" sha1="aabbccddeeff00112233445566778899aabbccdd"/>
+  </game>
+  <game name="1080 Avalanche (USA)">
+    <category>Games</category>
+    <description>1080 Avalanche (USA)</description>
+    <rom name="1080 Avalanche (USA).iso" size="1459617792" crc="cd3b4c5d" md5="1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d" sha1="99887766554433221100ffeeddccbbaa99887766"/>
+  </game>
+</datafile>

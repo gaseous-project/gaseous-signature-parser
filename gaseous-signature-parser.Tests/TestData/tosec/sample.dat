@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>Acorn BBC Micro - Games</name>
+    <description>Acorn BBC Micro - Games</description>
+    <category>TOSEC</category>
+    <version>2023-09-06</version>
+    <author>TOSEC</author>
+    <homepage>TOSEC</homepage>
+    <url>https://www.tosecdev.org/</url>
+  </header>
+  <game name="Space Invaders (1978)(Taito)(GB)">
+    <description>Space Invaders (1978)(Taito)(GB)</description>
+    <rom name="Space Invaders (1978)(Taito)(GB).ssd" size="204800" crc="abcd1234" md5="0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" sha1="aabbccddeeff00112233445566778899aabbccdd"/>
+  </game>
+  <game name="Frogger (1983)(Konami)(GB)">
+    <description>Frogger (1983)(Konami)(GB)</description>
+    <rom name="Frogger (1983)(Konami)(GB).ssd" size="163840" crc="dcba4321" md5="fedcba9876543210fedcba9876543210" sha1="99887766554433221100ffeeddccbbaa99887766"/>
+  </game>
+</datafile>

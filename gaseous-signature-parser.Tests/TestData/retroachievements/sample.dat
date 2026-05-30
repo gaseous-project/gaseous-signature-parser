@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>RetroAchievements - Nintendo - Game Boy</name>
+    <description>RetroAchievements - Nintendo - Game Boy</description>
+    <category>RetroAchievements</category>
+    <version>20230901</version>
+    <author>RetroAchievements</author>
+    <homepage>RetroAchievements</homepage>
+    <url>https://retroachievements.org</url>
+  </header>
+  <game name="Tetris (World)">
+    <description>Tetris (World)</description>
+    <rom name="Tetris (World).gb" size="32768" crc="46df91ad" md5="982ed7f98dc08c69de9f3de3e79ed505" sha1="dbbdea84ac9e88d40b6e73cfc46afe4c8ece5cac"/>
+  </game>
+</datafile>

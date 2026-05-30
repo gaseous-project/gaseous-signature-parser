@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<datafile>
+  <header>
+    <name>Pure DOS DAT</name>
+    <description>Pure DOS DAT</description>
+    <version>20230901</version>
+    <author>PureDOSDAT</author>
+    <homepage>Pure DOS DAT</homepage>
+    <url>https://www.puredosdat.com</url>
+  </header>
+  <game name="Commander Keen - Marooned on Mars">
+    <description>Commander Keen - Marooned on Mars</description>
+    <year>1990</year>
+    <developer>id Software</developer>
+    <rom name="keen1.exe" size="65536" crc="abcd1234" md5="0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d" sha1="aabbccddeeff00112233445566778899aabbccdd"/>
+  </game>
+  <game name="DOOM">
+    <description>DOOM</description>
+    <year>1993</year>
+    <developer>id Software</developer>
+    <rom name="doom.wad" size="12408292" crc="dcba4321" md5="fedcba9876543210fedcba9876543210" sha1="99887766554433221100ffeeddccbbaa99887766"/>
+  </game>
+</datafile>

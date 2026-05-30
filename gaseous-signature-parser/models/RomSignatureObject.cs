@@ -214,6 +214,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     MAMERedump = 11,
 
                     /// <summary>
+                    /// http://www.totaldoscollection.org/nugnugnug/
+                    /// </summary>
+                    TotalDOSCollection = 12,
+
+                    /// <summary>
                     /// https://www.screenscraper.fr
                     /// Source is XML or JSON from ScreenScraper API
                     /// </summary>

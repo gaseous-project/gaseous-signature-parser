@@ -120,7 +120,7 @@ namespace gaseous_signature_parser.classes.parsers
 
             XmlNodeList xmlMachine = xml.DocumentElement.SelectNodes("/datafile/machine");
 
-            if (xmlMachine == null)
+            if (xmlMachine == null || xmlMachine.Count == 0)
             {
                 return parser.SignatureParser.Unknown;
             }
