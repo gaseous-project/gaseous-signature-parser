@@ -138,9 +138,17 @@ if (datPath != null && datPath.Length > 0)
                         jsonSerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
                         jsonSerializerSettings.MaxDepth = 10;
 
-                        string jsonOutput = Newtonsoft.Json.JsonConvert.SerializeObject(datObject, jsonSerializerSettings);
                         string outFileName = Path.Combine(outpath, Path.GetFileNameWithoutExtension(datPathFile) + ".json");
-                        File.WriteAllText(outFileName, jsonOutput, Encoding.UTF8);
+                        JsonSerializer jsonSerializer = JsonSerializer.Create(jsonSerializerSettings);
+                        using FileStream outStream = File.Create(outFileName);
+                        using StreamWriter streamWriter = new StreamWriter(outStream, new UTF8Encoding(false));
+                        using JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter)
+                        {
+                            Formatting = jsonSerializerSettings.Formatting
+                        };
+
+                        jsonSerializer.Serialize(jsonWriter, datObject);
+                        jsonWriter.Flush();
                     }
                 }
             }
@@ -233,12 +241,18 @@ foreach (string romFile in romPathContents)
     }
 }
 
-string SearchTitle = "Impossible Mission";
+string SearchTitle = "Jingle Disk";
 foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)
     {
-        if (gameObject.Name == SearchTitle || gameObject.SortingName == SearchTitle)
+        bool nameMatches = string.Equals(gameObject.Name, SearchTitle, StringComparison.OrdinalIgnoreCase) ||
+                           (gameObject.Name?.Contains(SearchTitle, StringComparison.OrdinalIgnoreCase) ?? false);
+
+        bool sortingNameMatches = string.Equals(gameObject.SortingName, SearchTitle, StringComparison.OrdinalIgnoreCase) ||
+                                  (gameObject.SortingName?.Contains(SearchTitle, StringComparison.OrdinalIgnoreCase) ?? false);
+
+        if (nameMatches || sortingNameMatches)
         {
             var jsonSerializerSettings = new JsonSerializerSettings();
             jsonSerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
