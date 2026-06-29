@@ -227,7 +227,12 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// <summary>
                     /// Generic parser, used for custom parsers
                     /// </summary>
-                    Generic = 99
+                    Generic = 99,
+
+                    /// <summary>
+                    /// Unknown source type, used when the source type is not known or not specified
+                    /// </summary>
+                    Unknown = 100
                 }
 
                 public enum RomTypes
