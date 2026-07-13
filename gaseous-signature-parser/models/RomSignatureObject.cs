@@ -219,6 +219,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     TotalDOSCollection = 12,
 
                     /// <summary>
+                    /// https://www.retro-exo.com/exodos.html
+                    /// </summary>
+                    eXo = 13,
+
+                    /// <summary>
                     /// https://www.screenscraper.fr
                     /// Source is XML or JSON from ScreenScraper API
                     /// </summary>
