@@ -29,6 +29,7 @@ namespace gaseous_signature_parser.classes.parsers
                 parser.SignatureParser.Pleasuredome => new PleasuredomeParser(),
                 parser.SignatureParser.MAMERedump => new MAMERedumpParser(),
                 parser.SignatureParser.ScreenScraper => new ScreenScraperParser(),
+                parser.SignatureParser.eXo => new EXoParser(),
                 parser.SignatureParser.Generic => new GenericParser(),
                 parser.SignatureParser.Unknown => throw new ArgumentException("Cannot create parser for Unknown type", nameof(parserType)),
                 parser.SignatureParser.Auto => throw new ArgumentException("Cannot create parser for Auto type. Use GetSignatureType first.", nameof(parserType)),

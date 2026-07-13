@@ -241,7 +241,7 @@ foreach (string romFile in romPathContents)
     }
 }
 
-string SearchTitle = "Jingle Disk";
+string SearchTitle = "Bomberman";
 foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)

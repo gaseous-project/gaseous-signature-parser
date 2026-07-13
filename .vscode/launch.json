@@ -18,7 +18,7 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOME}/Development/Signatures/TotalDOSCollection",
+                "${env:HOME}/Development/Signatures/eXo",
                 "-dbpath",
                 "${env:HOME}/Development/Signatures/NoIntro/DB",
                 "-outpath",
