@@ -93,7 +93,7 @@ namespace gaseous_signature_parser.classes.parsers
                             break;
 
                         case "rom":
-                            RomSignatureObject.Game.Rom rom = ParseRomAttributes(childNode, RomSignatureObject.Game.Rom.SignatureSourceType.Generic);
+                            RomSignatureObject.Game.Rom rom = ParseRomAttributes(childNode, RomSignatureObject.Game.Rom.SignatureSourceType.HackHash);
                             machineObject.Roms.Add(rom);
 
                             break;
