@@ -27,6 +27,7 @@ public class parser
         SignatureParser.Pleasuredome,
         SignatureParser.MAMERedump,
         SignatureParser.eXo,
+        SignatureParser.HackHash,
         SignatureParser.Generic
     };
 
@@ -56,6 +57,7 @@ public class parser
         Pleasuredome = RomSignatureObject.Game.Rom.SignatureSourceType.Pleasuredome,
         MAMERedump = RomSignatureObject.Game.Rom.SignatureSourceType.MAMERedump,
         eXo = RomSignatureObject.Game.Rom.SignatureSourceType.eXo,
+        HackHash = RomSignatureObject.Game.Rom.SignatureSourceType.HackHash,
         Generic = RomSignatureObject.Game.Rom.SignatureSourceType.Generic,
         ScreenScraper = RomSignatureObject.Game.Rom.SignatureSourceType.ScreenScraper,
         TotalDOSCollection = RomSignatureObject.Game.Rom.SignatureSourceType.TotalDOSCollection,

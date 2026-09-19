@@ -224,6 +224,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     eXo = 13,
 
                     /// <summary>
+                    /// https://github.com/darkblood159/HackHash
+                    /// </summary>
+                    HackHash = 14,
+
+                    /// <summary>
                     /// https://www.screenscraper.fr
                     /// Source is XML or JSON from ScreenScraper API
                     /// </summary>
