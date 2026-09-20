@@ -77,6 +77,7 @@
     <Folder Include="Classes/" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Git" Version="10.0.303" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 </Project>
