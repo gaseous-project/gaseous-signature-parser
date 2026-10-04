@@ -264,4 +264,43 @@ public class ParserTests
         var keen = result.Games.Single(g => g.Name!.Contains("Commander Keen", StringComparison.OrdinalIgnoreCase));
         Assert.NotEmpty(keen.Roms);
     }
+
+    // ---------------------------------------------------------------------
+    // libretro
+    // ---------------------------------------------------------------------
+
+    [Fact]
+    public void libretro_Parse_ReturnsExpectedData()
+    {
+        var result = new libretroParser().Parse(TestData("libretro", "sample.dat"));
+        AssertBasicShape(result, "libretro");
+        Assert.Equal("Nintendo - Game Boy", result.Name);
+
+        var tetris = result.Games.Single(g => g.Name == "Tetris");
+        Assert.Equal("sample", tetris.System);
+        Assert.Equal("1", tetris.flags["release"]);
+
+        var rom = tetris.Roms.Single();
+        Assert.Equal("46df91ad", rom.Crc);
+        Assert.Equal(RomSignatureObject.Game.Rom.SignatureSourceType.libretro, rom.SignatureSource);
+        Assert.Equal(RomSignatureObject.Game.Rom.RomTypes.Cartridge, rom.RomType);
+    }
+
+    [Fact]
+    public void libretro_Parse_MergesSupplementaryMetadataByHash()
+    {
+        var options = new Dictionary<string, object>
+        {
+            { "PathToDBFile", TestData("libretro", "db") }
+        };
+        var result = new libretroParser().Parse(TestData("libretro", "sample.dat"), options);
+
+        var tetris = result.Games.Single(g => g.Name == "Tetris");
+        Assert.Equal("Nintendo", tetris.Publisher);
+        Assert.Equal("1989", tetris.Year);
+
+        var unmatched = result.Games.Single(g => g.Name == "Unmatched Game");
+        Assert.True(string.IsNullOrEmpty(unmatched.Publisher));
+        Assert.True(string.IsNullOrEmpty(unmatched.Year));
+    }
 }

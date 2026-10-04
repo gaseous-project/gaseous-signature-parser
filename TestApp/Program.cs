@@ -13,6 +13,7 @@ string scanPath = "./";
 string datPath = "";
 string? dbPath = null;
 string? outpath = null;
+string? parserModeStr = null;
 
 string inArgument = "";
 foreach (string commandLineArg in commandLineArgs)
@@ -28,6 +29,7 @@ foreach (string commandLineArg in commandLineArgs)
                 case "-datpath":
                 case "-dbpath":
                 case "-outpath":
+                case "-parser":
                     inArgument = commandLineArg.ToLower();
                     break;
                 default:
@@ -50,6 +52,9 @@ foreach (string commandLineArg in commandLineArgs)
                 case "-outpath":
                     outpath = commandLineArg;
                     break;
+                case "-parser":
+                    parserModeStr = commandLineArg;
+                    break;
                 default:
                     break;
             }
@@ -60,6 +65,22 @@ foreach (string commandLineArg in commandLineArgs)
 
 scanPath = Path.GetFullPath(scanPath);
 Console.WriteLine("ROM search path: " + scanPath);
+
+// set the parser mode
+parser.SignatureParser parserMode = parser.SignatureParser.Auto;
+// convert parserModeStr to parser.SignatureParser
+if (!string.IsNullOrWhiteSpace(parserModeStr))
+{
+    if (Enum.TryParse(parserModeStr, true, out parser.SignatureParser parsedMode))
+    {
+        parserMode = parsedMode;
+    }
+    else
+    {
+        Console.WriteLine("Invalid parser mode specified. Valid modes are: " + string.Join(", ", Enum.GetNames(typeof(parser.SignatureParser))));
+        Environment.Exit(1);
+    }
+}
 
 List<RomSignatureObject> romSignatures = new List<RomSignatureObject>();
 System.Collections.ArrayList availablePlatforms = new System.Collections.ArrayList();
@@ -93,7 +114,7 @@ if (datPath != null && datPath.Length > 0)
         parser Parser = new parser();
         try
         {
-            string? dbPathFile = null;
+            string? dbPathFile = dbPath;
             string dbPathName = "";
             if (dbPathContents.Length > 0)
             {
@@ -109,7 +130,7 @@ if (datPath != null && datPath.Length > 0)
                 }
             }
 
-            RomSignatureObject datObject = Parser.ParseSignatureDAT(datPathFile, dbPathFile);
+            RomSignatureObject datObject = Parser.ParseSignatureDAT(datPathFile, dbPathFile, parserMode);
 
             if (datObject != null)
             {
@@ -241,7 +262,7 @@ foreach (string romFile in romPathContents)
     }
 }
 
-string SearchTitle = "Bomberman";
+string SearchTitle = "Star Fox";
 foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)

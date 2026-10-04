@@ -36,7 +36,8 @@ public class parser
     /// </summary>
     public static readonly SignatureParser[] bracketParserTypesToCheck = new[]
     {
-        SignatureParser.TotalDOSCollection
+        SignatureParser.TotalDOSCollection,
+        SignatureParser.libretro
     };
 
     /// <summary>
@@ -61,6 +62,7 @@ public class parser
         Generic = RomSignatureObject.Game.Rom.SignatureSourceType.Generic,
         ScreenScraper = RomSignatureObject.Game.Rom.SignatureSourceType.ScreenScraper,
         TotalDOSCollection = RomSignatureObject.Game.Rom.SignatureSourceType.TotalDOSCollection,
+        libretro = RomSignatureObject.Game.Rom.SignatureSourceType.libretro,
         Unknown = 100
     }
 
@@ -111,9 +113,16 @@ public class parser
             else if (DetectedSignatureType == SignatureParser.NoIntro && PathToDBFile != null)
             {
                 options = new Dictionary<string, object>
+                {
+                    { "PathToDBFile", PathToDBFile }
+                };
+            }
+            else
             {
-                { "PathToDBFile", PathToDBFile }
-            };
+                options = new Dictionary<string, object>
+                {
+                    { "PathToDBFile", PathToDBFile }
+                };
             }
 
             return parser.Parse(PathToFile, options);
@@ -122,7 +131,11 @@ public class parser
         {
             // Use factory to create the appropriate parser
             classes.bracketparsers.IParser parser = classes.bracketparsers.ParserFactory.CreateParser(DetectedSignatureType);
-            return parser.Parse(PathToFile);
+            Dictionary<string, object> options = new Dictionary<string, object>
+            {
+                { "PathToDBFile", PathToDBFile }
+            };
+            return parser.Parse(PathToFile, options);
         }
         else
         {
@@ -148,7 +161,8 @@ public class parser
             {
                 var bracketParserTypesToCheck = new[]
                 {
-                    SignatureParser.TotalDOSCollection
+                    SignatureParser.TotalDOSCollection,
+                    SignatureParser.libretro
                 };
 
                 foreach (var parserType in bracketParserTypesToCheck)

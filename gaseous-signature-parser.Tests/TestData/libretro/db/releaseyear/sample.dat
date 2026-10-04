@@ -1,0 +1,11 @@
+clrmamepro (
+	name "Nintendo - Game Boy"
+	description "Nintendo - Game Boy"
+	version "20260101"
+)
+
+game (
+	name "Tetris (World) (Rev 1)"
+	releaseyear "1989"
+	rom ( name "Tetris (World) (Rev 1).gb" size 32768 crc 46df91ad md5 982ed5d2b12a0377eb14bcdc4123744e sha1 74ecc1b4a6ae8e5b8ee6a9c3b6e0ea3d8ac5e8de )
+)

@@ -307,4 +307,16 @@ public class DetectionTests
         var result = p.GetDatType(TestData("tosec", "sample.dat"));
         Assert.Equal(parser.SignatureParser.Unknown, result);
     }
+
+    // -------------------------------------------------------------------------
+    // libretro (bracket DAT) - never auto-detected; must be selected explicitly
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void libretro_Is_Not_AutoDetected()
+    {
+        var p = new libretroParser();
+        var result = p.GetDatType(TestData("libretro", "sample.dat"));
+        Assert.Equal(parser.SignatureParser.Unknown, result);
+    }
 }
