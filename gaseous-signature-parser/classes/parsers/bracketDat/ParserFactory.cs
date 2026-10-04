@@ -18,6 +18,7 @@ namespace gaseous_signature_parser.classes.bracketparsers
             return parserType switch
             {
                 parser.SignatureParser.TotalDOSCollection => new TotalDOSCollectionParser(),
+                parser.SignatureParser.libretro => new libretroParser(),
                 parser.SignatureParser.Unknown => throw new ArgumentException("Cannot create parser for Unknown type", nameof(parserType)),
                 parser.SignatureParser.Auto => throw new ArgumentException("Cannot create parser for Auto type. Use GetSignatureType first.", nameof(parserType)),
                 _ => throw new ArgumentException($"Unknown parser type: {parserType}", nameof(parserType))

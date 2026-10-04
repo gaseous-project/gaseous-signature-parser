@@ -93,7 +93,7 @@ if (datPath != null && datPath.Length > 0)
         parser Parser = new parser();
         try
         {
-            string? dbPathFile = null;
+            string? dbPathFile = dbPath;
             string dbPathName = "";
             if (dbPathContents.Length > 0)
             {
@@ -241,7 +241,7 @@ foreach (string romFile in romPathContents)
     }
 }
 
-string SearchTitle = "Bomberman";
+string SearchTitle = "Star Fox";
 foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)

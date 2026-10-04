@@ -134,7 +134,27 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                 public Dictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
-                public RomTypes RomType { get; set; }
+                private RomTypes? _RomType = null;
+                public RomTypes? RomType
+                {
+                    get
+                    {
+                        // if RomType was manually set, return it, otherwise we'll try to determine it from extension
+                        if (_RomType != null)
+                        {
+                            return (RomTypes)_RomType;
+                        }
+                        if (!String.IsNullOrWhiteSpace(Name))
+                        {
+                            return GetMediaTypeFromExtension(Path.GetExtension(Name));
+                        }
+                        return Rom.RomTypes.Unknown;
+                    }
+                    set
+                    {
+                        _RomType = value;
+                    }
+                }
                 public string? RomTypeMedia { get; set; }
                 public MediaType? MediaDetail
                 {
@@ -142,7 +162,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     {
                         if (RomTypeMedia != null)
                         {
-                            return new MediaType(SignatureSource, RomTypeMedia);
+                            return new MediaType(Name, SignatureSource, RomTypeMedia);
                         }
                         else
                         {
@@ -229,6 +249,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     HackHash = 14,
 
                     /// <summary>
+                    /// https://github.com/libretro/libretro-database
+                    /// </summary>
+                    libretro = 15,
+
+                    /// <summary>
                     /// https://www.screenscraper.fr
                     /// Source is XML or JSON from ScreenScraper API
                     /// </summary>
@@ -280,13 +305,72 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     /// <summary>
                     /// Side of the media
                     /// </summary>
-                    Side = 6
+                    Side = 6,
+
+                    /// <summary>
+                    /// Cartridge media
+                    /// </summary>
+                    Cartridge = 7
+                }
+
+                private static readonly Dictionary<RomTypes, string[]> ExtensionsByType = new()
+                {
+                    [RomTypes.Disc] = new[]
+                    {
+                        "iso", "cue", "bin", "img", "mdf", "mds", "nrg", "chd", "gdi", "cdi",
+                        "ccd", "wbfs", "rvz", "gcm", "wia"
+                    },
+                    [RomTypes.Disk] = new[]
+                    {
+                        "adf", "atr", "dsk", "d64", "d71", "d81", "g64", "st", "msa", "dmk",
+                        "fdi", "ipf", "hfe", "fdd", "td0", "imd", "86f", "nib", "po", "2mg",
+                        "woz", "vhd", "hdf"
+                    },
+                    [RomTypes.Tape] = new[]
+                    {
+                        "tap", "tzx", "cas", "t64", "wav", "csw", "p", "o", "mdr", "cdt", "uef"
+                    },
+                    [RomTypes.Cartridge] = new[]
+                    {
+                        "nes", "sfc", "smc", "gb", "gbc", "gba", "n64", "z64", "v64", "md",
+                        "gen", "smd", "sms", "gg", "a26", "a52", "a78", "lnx", "pce", "ws",
+                        "wsc", "nds", "vb", "col", "crt", "rom", "int", "sg", "ngp", "ngc", "fds"
+                    },
+                    [RomTypes.File] = new[]
+                    {
+                        "zip", "7z", "rar", "exe", "com", "prg", "sna", "z80", "szx", "tzs",
+                        "xex", "bas"
+                    }
+                };
+
+                public static RomTypes GetMediaTypeFromExtension(string extension)
+                {
+                    if (string.IsNullOrWhiteSpace(extension))
+                        return RomTypes.Unknown;
+
+                    string ext = extension.Trim().TrimStart('.');
+
+                    foreach (var (type, extensions) in ExtensionsByType)
+                    {
+                        if (Array.Exists(extensions, e => e.Equals(ext, StringComparison.OrdinalIgnoreCase)))
+                            return type;
+                    }
+
+                    return RomTypes.Unknown;
                 }
 
                 public class MediaType
                 {
-                    public MediaType(SignatureSourceType Source, string MediaTypeString)
+                    private string FileName;
+
+                    public MediaType(string fileName)
                     {
+                        FileName = fileName;
+                    }
+
+                    public MediaType(string fileName, SignatureSourceType Source, string MediaTypeString)
+                    {
+                        FileName = fileName;
                         try
                         {
                             switch (Source)
@@ -295,6 +379,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                                 case Rom.SignatureSourceType.NoIntros:
                                 case Rom.SignatureSourceType.Redump:
                                 case Rom.SignatureSourceType.MAMERedump:
+                                case Rom.SignatureSourceType.libretro:
                                     string[] typeString = MediaTypeString.Split(" ");
 
                                     string inType = "";
