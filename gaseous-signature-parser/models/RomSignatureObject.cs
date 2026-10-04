@@ -134,8 +134,8 @@ namespace gaseous_signature_parser.models.RomSignatureObject
 
                 public Dictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
-                private RomTypes? _RomType = null;
-                public RomTypes? RomType
+                private RomTypes? _RomType;
+                public RomTypes RomType
                 {
                     get
                     {
@@ -366,6 +366,11 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     public MediaType(string fileName)
                     {
                         FileName = fileName;
+                    }
+
+                    public MediaType(SignatureSourceType Source, string MediaTypeString)
+                        : this(string.Empty, Source, MediaTypeString)
+                    {
                     }
 
                     public MediaType(string fileName, SignatureSourceType Source, string MediaTypeString)
