@@ -324,7 +324,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     {
                         "adf", "atr", "dsk", "d64", "d71", "d81", "g64", "st", "msa", "dmk",
                         "fdi", "ipf", "hfe", "fdd", "td0", "imd", "86f", "nib", "po", "2mg",
-                        "woz", "vhd", "hdf"
+                        "woz", "vhd", "hdf", "fds"
                     },
                     [RomTypes.Tape] = new[]
                     {
@@ -334,7 +334,7 @@ namespace gaseous_signature_parser.models.RomSignatureObject
                     {
                         "nes", "sfc", "smc", "gb", "gbc", "gba", "n64", "z64", "v64", "md",
                         "gen", "smd", "sms", "gg", "a26", "a52", "a78", "lnx", "pce", "ws",
-                        "wsc", "nds", "vb", "col", "crt", "rom", "int", "sg", "ngp", "ngc", "fds"
+                        "wsc", "nds", "vb", "col", "crt", "rom", "int", "sg", "ngp", "ngc"
                     },
                     [RomTypes.File] = new[]
                     {

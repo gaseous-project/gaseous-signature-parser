@@ -33,8 +33,8 @@ namespace gaseous_signature_parser.classes.bracketparsers
 
         public override parser.SignatureParser GetDatType(string dat)
         {
-            // Since this is the libretro parser, we always return the libretro signature type as there is no unique way to determine it from the DAT file itself.
-            return parser.SignatureParser.libretro;
+            // there is nothing unique in the DAT file to identify it as a libretro DAT, so we return Unknown.
+            return parser.SignatureParser.Unknown;
         }
 
         public override RomSignatureObject Parse(string datFile, Dictionary<string, object>? options = null)
@@ -143,6 +143,23 @@ namespace gaseous_signature_parser.classes.bracketparsers
                 {
                     metadataContent["hacks"] = Parse(metadataHacksFile);
                 }
+            }
+
+            // index each metadata file once so per-ROM lookups are constant time (first game wins on duplicate hashes)
+            Dictionary<string, Dictionary<string, RomSignatureObject.Game>> metadataIndex = new Dictionary<string, Dictionary<string, RomSignatureObject.Game>>();
+            foreach (var metadata in metadataContent)
+            {
+                var index = new Dictionary<string, RomSignatureObject.Game>(StringComparer.OrdinalIgnoreCase);
+                foreach (RomSignatureObject.Game metadataGame in metadata.Value.Games)
+                {
+                    foreach (RomSignatureObject.Game.Rom metadataRom in metadataGame.Roms)
+                    {
+                        if (!string.IsNullOrEmpty(metadataRom.Crc)) index.TryAdd("crc:" + metadataRom.Crc, metadataGame);
+                        if (!string.IsNullOrEmpty(metadataRom.Md5)) index.TryAdd("md5:" + metadataRom.Md5, metadataGame);
+                        if (!string.IsNullOrEmpty(metadataRom.Sha1)) index.TryAdd("sha1:" + metadataRom.Sha1, metadataGame);
+                    }
+                }
+                metadataIndex[metadata.Key] = index;
             }
 
             foreach (KeyValuePair<string, string> headerItem in headerData)
@@ -398,13 +415,15 @@ namespace gaseous_signature_parser.classes.bracketparsers
                         }
 
                         // search supplementary metadata for this game by searching for the CRC, MD5, or SHA1 hash in the supplementary metadata files
-                        if (metadataContent.Count > 0)
+                        if (metadataIndex.Count > 0)
                         {
                             Dictionary<string, RomSignatureObject.Game> supplementaryMetadataByHash = new Dictionary<string, RomSignatureObject.Game>();
-                            foreach (var metadata in metadataContent)
+                            foreach (var metadata in metadataIndex)
                             {
-                                // search for this game's CRC, MD5, or SHA1 in the supplementary metadata
-                                RomSignatureObject.Game? gameMetadata = metadata.Value.Games.FirstOrDefault(g => g.Roms.Any(r => r.Crc == rom.Crc || r.Md5 == rom.Md5 || r.Sha1 == rom.Sha1));
+                                RomSignatureObject.Game? gameMetadata = null;
+                                if (!string.IsNullOrEmpty(rom.Crc)) metadata.Value.TryGetValue("crc:" + rom.Crc, out gameMetadata);
+                                if (gameMetadata == null && !string.IsNullOrEmpty(rom.Md5)) metadata.Value.TryGetValue("md5:" + rom.Md5, out gameMetadata);
+                                if (gameMetadata == null && !string.IsNullOrEmpty(rom.Sha1)) metadata.Value.TryGetValue("sha1:" + rom.Sha1, out gameMetadata);
                                 if (gameMetadata != null)
                                 {
                                     supplementaryMetadataByHash[metadata.Key] = gameMetadata;
@@ -557,11 +576,6 @@ namespace gaseous_signature_parser.classes.bracketparsers
             {
                 RawName = archiveName
             };
-
-            if (archiveName.StartsWith("3D Fight", StringComparison.OrdinalIgnoreCase) || archiveName.StartsWith("3 Guerra Mundial", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine("ROM name");
-            }
 
             string working = RemoveArchiveExtension(archiveName).Trim();
 
