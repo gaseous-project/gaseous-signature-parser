@@ -282,7 +282,6 @@ namespace gaseous_signature_parser.classes.bracketparsers
                                 {
                                     case "name":
                                         rom.Name = childAttribute.Value;
-                                        rom.RomType = null;
 
                                         // parse the rom name
                                         // remove the extension
