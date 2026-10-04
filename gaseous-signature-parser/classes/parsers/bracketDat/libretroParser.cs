@@ -421,9 +421,9 @@ namespace gaseous_signature_parser.classes.bracketparsers
                             foreach (var metadata in metadataIndex)
                             {
                                 RomSignatureObject.Game? gameMetadata = null;
-                                if (!string.IsNullOrEmpty(rom.Crc)) metadata.Value.TryGetValue("crc:" + rom.Crc, out gameMetadata);
+                                if (!string.IsNullOrEmpty(rom.Sha1)) metadata.Value.TryGetValue("sha1:" + rom.Sha1, out gameMetadata);
                                 if (gameMetadata == null && !string.IsNullOrEmpty(rom.Md5)) metadata.Value.TryGetValue("md5:" + rom.Md5, out gameMetadata);
-                                if (gameMetadata == null && !string.IsNullOrEmpty(rom.Sha1)) metadata.Value.TryGetValue("sha1:" + rom.Sha1, out gameMetadata);
+                                if (gameMetadata == null && !string.IsNullOrEmpty(rom.Crc)) metadata.Value.TryGetValue("crc:" + rom.Crc, out gameMetadata);
                                 if (gameMetadata != null)
                                 {
                                     supplementaryMetadataByHash[metadata.Key] = gameMetadata;
