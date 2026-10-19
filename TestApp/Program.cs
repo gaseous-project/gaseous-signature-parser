@@ -262,7 +262,7 @@ foreach (string romFile in romPathContents)
     }
 }
 
-string SearchTitle = "Star Fox";
+string SearchTitle = "Super Mario Kart";
 foreach (RomSignatureObject romSignatureObject in romSignatures)
 {
     foreach (RomSignatureObject.Game gameObject in romSignatureObject.Games)

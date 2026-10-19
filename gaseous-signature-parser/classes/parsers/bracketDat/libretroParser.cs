@@ -63,7 +63,7 @@ namespace gaseous_signature_parser.classes.bracketparsers
             // pre-load metadata files for this platform if present
             // get the path to the datFile's directory
             string datDirectory = Path.GetDirectoryName(datFile) ?? string.Empty;
-            Dictionary<string, RomSignatureObject> metadataContent = new Dictionary<string, RomSignatureObject>();
+            Dictionary<string, object> metadataContent = new Dictionary<string, object>();
             if (options != null && options.ContainsKey("PathToDBFile") && options["PathToDBFile"] != null)
             {
                 // load supplementary metadata files if they exist
@@ -85,81 +85,64 @@ namespace gaseous_signature_parser.classes.bracketparsers
 
                 if (File.Exists(metadataDeveloperFile))
                 {
-                    metadataContent["developer"] = Parse(metadataDeveloperFile);
+                    metadataContent["developer"] = ExtractDataEntries(metadataDeveloperFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataHardwareFile))
                 {
-                    metadataContent["enhancement_hw"] = Parse(metadataHardwareFile);
+                    metadataContent["enhancement_hw"] = ExtractDataEntries(metadataHardwareFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataESRBFile))
                 {
-                    metadataContent["esrb"] = Parse(metadataESRBFile);
+                    metadataContent["esrb"] = ExtractDataEntries(metadataESRBFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataGenreFile))
                 {
-                    metadataContent["genre"] = Parse(metadataGenreFile);
+                    metadataContent["genre"] = ExtractDataEntries(metadataGenreFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataMaxUsersFile))
                 {
-                    metadataContent["maxusers"] = Parse(metadataMaxUsersFile);
+                    metadataContent["maxusers"] = ExtractDataEntries(metadataMaxUsersFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataNoIntroFile))
                 {
-                    metadataContent["nointro"] = Parse(metadataNoIntroFile);
+                    metadataContent["nointro"] = ExtractDataEntries(metadataNoIntroFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataPublisherFile))
                 {
-                    metadataContent["publisher"] = Parse(metadataPublisherFile);
+                    metadataContent["publisher"] = ExtractDataEntries(metadataPublisherFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataReleaseMonthFile))
                 {
-                    metadataContent["releasemonth"] = Parse(metadataReleaseMonthFile);
+                    metadataContent["releasemonth"] = ExtractDataEntries(metadataReleaseMonthFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataReleaseYearFile))
                 {
-                    metadataContent["releaseyear"] = Parse(metadataReleaseYearFile);
+                    metadataContent["releaseyear"] = ExtractDataEntries(metadataReleaseYearFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataSerialFile))
                 {
-                    metadataContent["serial"] = Parse(metadataSerialFile);
+                    metadataContent["serial"] = ExtractDataEntries(metadataSerialFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataTosecFile))
                 {
-                    metadataContent["tosec"] = Parse(metadataTosecFile);
+                    metadataContent["tosec"] = ExtractDataEntries(metadataTosecFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataRumbleFile))
                 {
-                    metadataContent["rumble"] = Parse(metadataRumbleFile);
+                    metadataContent["rumble"] = ExtractDataEntries(metadataRumbleFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataHomebrewFile))
                 {
-                    metadataContent["homebrew"] = Parse(metadataHomebrewFile);
+                    metadataContent["homebrew"] = ExtractDataEntries(metadataHomebrewFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataHeaderedFile))
                 {
-                    metadataContent["headered"] = Parse(metadataHeaderedFile);
+                    metadataContent["headered"] = ExtractDataEntries(metadataHeaderedFile, EntryTags, ChildTags);
                 }
                 if (File.Exists(metadataHacksFile))
                 {
-                    metadataContent["hacks"] = Parse(metadataHacksFile);
+                    metadataContent["hacks"] = ExtractDataEntries(metadataHacksFile, EntryTags, ChildTags);
                 }
-            }
-
-            // index each metadata file once so per-ROM lookups are constant time (first game wins on duplicate hashes)
-            Dictionary<string, Dictionary<string, RomSignatureObject.Game>> metadataIndex = new Dictionary<string, Dictionary<string, RomSignatureObject.Game>>();
-            foreach (var metadata in metadataContent)
-            {
-                var index = new Dictionary<string, RomSignatureObject.Game>(StringComparer.OrdinalIgnoreCase);
-                foreach (RomSignatureObject.Game metadataGame in metadata.Value.Games)
-                {
-                    foreach (RomSignatureObject.Game.Rom metadataRom in metadataGame.Roms)
-                    {
-                        if (!string.IsNullOrEmpty(metadataRom.Crc)) index.TryAdd("crc:" + metadataRom.Crc, metadataGame);
-                        if (!string.IsNullOrEmpty(metadataRom.Md5)) index.TryAdd("md5:" + metadataRom.Md5, metadataGame);
-                        if (!string.IsNullOrEmpty(metadataRom.Sha1)) index.TryAdd("sha1:" + metadataRom.Sha1, metadataGame);
-                    }
-                }
-                metadataIndex[metadata.Key] = index;
             }
 
             foreach (KeyValuePair<string, string> headerItem in headerData)
@@ -198,6 +181,98 @@ namespace gaseous_signature_parser.classes.bracketparsers
                     case "category":
                         signatureObject.Category = headerItem.Value;
                         break;
+                }
+            }
+
+            // index entries by game name so metadata merges don't rescan the list
+            var entryIndex = new Dictionary<string, Dictionary<string, object>>();
+            foreach (var indexedEntry in entries)
+            {
+                var indexedAttributes = (Dictionary<string, string>)indexedEntry["attributes"];
+                if (indexedAttributes.TryGetValue("name", out string? indexedName) || indexedAttributes.TryGetValue("comment", out indexedName))
+                {
+                    entryIndex.TryAdd(indexedName, indexedEntry);
+                }
+            }
+
+            // merge metadata content into entries
+            foreach (string key in metadataContent.Keys)
+            {
+                foreach (Dictionary<string, object> metadataEntry in (List<Dictionary<string, object>>)metadataContent[key])
+                {
+                    // search entries for an existing entry that matches the metadata entry
+                    var metadataAttributesItem = (Dictionary<string, string>)metadataEntry["attributes"];
+
+                    string metadataGameName;
+                    if (metadataAttributesItem.ContainsKey("name"))
+                    {
+                        metadataGameName = (string)metadataAttributesItem["name"];
+                    }
+                    else if (metadataAttributesItem.ContainsKey("comment"))
+                    {
+                        metadataGameName = (string)metadataAttributesItem["comment"];
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    var metadataRomsItem = new List<Dictionary<string, object>>();
+                    if (metadataEntry.ContainsKey("children"))
+                    {
+                        var children = (List<Dictionary<string, object>>)metadataEntry["children"];
+
+                        foreach (var child in children)
+                        {
+                            if (child.ContainsKey("tag"))
+                            {
+                                if (child["tag"].ToString() == "rom")
+                                {
+                                    metadataRomsItem.Add(child);
+                                }
+                            }
+                        }
+
+                        // metadataRomsItem = (Dictionary<string, object>)((Dictionary<string, object>)metadataEntry["children"])["tag"];
+                    }
+
+                    if (entryIndex.TryGetValue(metadataGameName, out Dictionary<string, object>? entry))
+                    {
+                        // copy attributes the existing entry doesn't already have
+                        var entryAttributes = (Dictionary<string, string>)entry["attributes"];
+                        foreach (var meKey in metadataAttributesItem.Keys)
+                        {
+                            entryAttributes.TryAdd(meKey, metadataAttributesItem[meKey]);
+                        }
+
+                        if (entry["children"] is not List<Dictionary<string, object>> entryChildren)
+                        {
+                            entryChildren = new List<Dictionary<string, object>>();
+                            entry["children"] = entryChildren;
+                        }
+
+                        foreach (var rom in metadataRomsItem)
+                        {
+                            Dictionary<string, object>? existingRom = entryChildren.FirstOrDefault(entryRom => IsSameRom(entryRom, rom));
+                            if (existingRom == null)
+                            {
+                                entryChildren.Add(rom);
+                            }
+                            else if (existingRom["attributes"] is Dictionary<string, string> existingAttributes &&
+                                rom["attributes"] is Dictionary<string, string> romAttributes)
+                            {
+                                foreach (var romAttribute in romAttributes)
+                                {
+                                    existingAttributes.TryAdd(romAttribute.Key, romAttribute.Value);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        entries.Add(metadataEntry);
+                        entryIndex[metadataGameName] = metadataEntry;
+                    }
                 }
             }
 
@@ -413,62 +488,6 @@ namespace gaseous_signature_parser.classes.bracketparsers
                             }
                         }
 
-                        // search supplementary metadata for this game by searching for the CRC, MD5, or SHA1 hash in the supplementary metadata files
-                        if (metadataIndex.Count > 0)
-                        {
-                            Dictionary<string, RomSignatureObject.Game> supplementaryMetadataByHash = new Dictionary<string, RomSignatureObject.Game>();
-                            foreach (var metadata in metadataIndex)
-                            {
-                                RomSignatureObject.Game? gameMetadata = null;
-                                if (!string.IsNullOrEmpty(rom.Sha1)) metadata.Value.TryGetValue("sha1:" + rom.Sha1, out gameMetadata);
-                                if (gameMetadata == null && !string.IsNullOrEmpty(rom.Md5)) metadata.Value.TryGetValue("md5:" + rom.Md5, out gameMetadata);
-                                if (gameMetadata == null && !string.IsNullOrEmpty(rom.Crc)) metadata.Value.TryGetValue("crc:" + rom.Crc, out gameMetadata);
-                                if (gameMetadata != null)
-                                {
-                                    supplementaryMetadataByHash[metadata.Key] = gameMetadata;
-                                }
-                            }
-
-                            if (supplementaryMetadataByHash.Count > 0)
-                            {
-                                foreach (var supplementaryMetadata in supplementaryMetadataByHash)
-                                {
-                                    // merge each supplementary metadata game into the current game object
-                                    // this could involve copying over attributes, roms, etc.
-                                    switch (supplementaryMetadata.Key)
-                                    {
-                                        case "developer":
-                                            if (string.IsNullOrWhiteSpace(game.Publisher))
-                                            {
-                                                game.Publisher = supplementaryMetadata.Value.Publisher;
-                                            }
-                                            break;
-                                        case "releaseyear":
-                                            if (string.IsNullOrWhiteSpace(game.Year))
-                                            {
-                                                if (supplementaryMetadata.Value.Year != null)
-                                                {
-                                                    game.Year = supplementaryMetadata.Value.Year;
-                                                    game.flags["releaseyear"] = supplementaryMetadata.Value.Year;
-                                                }
-                                            }
-                                            break;
-                                        default:
-                                            // copy any other flags from the supplementary metadata if they don't already exist in the game object
-                                            foreach (var flag in supplementaryMetadata.Value.flags)
-                                            {
-                                                if (!game.flags.ContainsKey(flag.Key))
-                                                {
-                                                    game.flags[flag.Key] = flag.Value;
-                                                }
-                                            }
-                                            break;
-                                    }
-                                }
-                                // Console.WriteLine($"Merged supplementary metadata for game: {game.Name}");
-                            }
-                        }
-
                         game.Roms.Add(rom);
                     }
                 }
@@ -477,6 +496,35 @@ namespace gaseous_signature_parser.classes.bracketparsers
             }
 
             return signatureObject;
+        }
+
+        private static readonly string[] RomHashKeys = { "sha256", "sha1", "md5", "crc" };
+
+        private static bool IsSameRom(Dictionary<string, object> a, Dictionary<string, object> b)
+        {
+            if (a["attributes"] is not Dictionary<string, string> attrsA || b["attributes"] is not Dictionary<string, string> attrsB)
+            {
+                return false;
+            }
+
+            bool anyHash = false;
+            foreach (string hashKey in RomHashKeys)
+            {
+                if (attrsA.TryGetValue(hashKey, out string? hashA) && attrsB.TryGetValue(hashKey, out string? hashB))
+                {
+                    anyHash = true;
+                    if (string.Equals(hashA, hashB, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            // no comparable hashes - fall back to the ROM name
+            return !anyHash &&
+                attrsA.TryGetValue("name", out string? nameA) &&
+                attrsB.TryGetValue("name", out string? nameB) &&
+                string.Equals(nameA, nameB, StringComparison.OrdinalIgnoreCase);
         }
 
         private static void ApplyParsedGameName(RomSignatureObject.Game game, string archiveName)

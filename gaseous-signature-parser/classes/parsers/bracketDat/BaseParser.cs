@@ -797,6 +797,5 @@ namespace gaseous_signature_parser.classes.bracketparsers
 
             return true;
         }
-
     }
 }
