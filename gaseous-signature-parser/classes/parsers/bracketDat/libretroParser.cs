@@ -189,7 +189,12 @@ namespace gaseous_signature_parser.classes.bracketparsers
             foreach (var indexedEntry in entries)
             {
                 var indexedAttributes = (Dictionary<string, string>)indexedEntry["attributes"];
-                if (indexedAttributes.TryGetValue("name", out string? indexedName) || indexedAttributes.TryGetValue("comment", out indexedName))
+                if (!indexedAttributes.ContainsKey("name") && indexedAttributes.TryGetValue("comment", out string? indexedComment))
+                {
+                    indexedAttributes["name"] = indexedComment;
+                }
+
+                if (indexedAttributes.TryGetValue("name", out string? indexedName))
                 {
                     entryIndex.TryAdd(indexedName, indexedEntry);
                 }
@@ -203,16 +208,12 @@ namespace gaseous_signature_parser.classes.bracketparsers
                     // search entries for an existing entry that matches the metadata entry
                     var metadataAttributesItem = (Dictionary<string, string>)metadataEntry["attributes"];
 
-                    string metadataGameName;
-                    if (metadataAttributesItem.ContainsKey("name"))
+                    if (!metadataAttributesItem.ContainsKey("name") && metadataAttributesItem.TryGetValue("comment", out string? metadataComment))
                     {
-                        metadataGameName = (string)metadataAttributesItem["name"];
+                        metadataAttributesItem["name"] = metadataComment;
                     }
-                    else if (metadataAttributesItem.ContainsKey("comment"))
-                    {
-                        metadataGameName = (string)metadataAttributesItem["comment"];
-                    }
-                    else
+
+                    if (!metadataAttributesItem.TryGetValue("name", out string? metadataGameName))
                     {
                         continue;
                     }
@@ -226,14 +227,12 @@ namespace gaseous_signature_parser.classes.bracketparsers
                         {
                             if (child.ContainsKey("tag"))
                             {
-                                if (child["tag"].ToString() == "rom")
+                                if (child["tag"].ToString().ToLowerInvariant() == "rom")
                                 {
                                     metadataRomsItem.Add(child);
                                 }
                             }
                         }
-
-                        // metadataRomsItem = (Dictionary<string, object>)((Dictionary<string, object>)metadataEntry["children"])["tag"];
                     }
 
                     if (entryIndex.TryGetValue(metadataGameName, out Dictionary<string, object>? entry))

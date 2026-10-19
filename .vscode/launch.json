@@ -18,11 +18,11 @@
             "launchConfigurationId": "TargetFramework=;TestApp",
             "args": [
                 "-datpath",
-                "${env:HOMEPATH}/Development/libretro-database/dat",
+                "${userHome}/Development/libretro-database/dat",
                 "-dbpath",
-                "${env:HOMEPATH}/Development/libretro-database/metadat",
+                "${userHome}/Development/libretro-database/metadat",
                 "-outpath",
-                "${env:HOMEPATH}/Development/Signatures/Output",
+                "${userHome}/Development/Signatures/Output",
                 "-parser",
                 "libretro"
             ]
